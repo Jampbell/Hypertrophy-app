@@ -72,7 +72,8 @@ if menu == "📝 Log Today's Lift":
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:",, index=1, format_func=lambda x: f"{x} Seconds")
+    # FIXED LINE: Removed the duplicate comma sequence completely
+    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -118,7 +119,7 @@ elif menu == "📈 View Training Logs":
         unique_dates = history_df["Date"].unique()[::-1]
         for target_date in unique_dates:
             date_df = history_df[history_df["Date"] == target_date]
-            routine_name = date_df["Routine"].iloc
+            routine_name = date_df["Routine"].iloc[0]
             
             with st.expander(f"📅 {target_date} — {routine_name}"):
                 for ex_name in date_df["Exercise"].unique():
@@ -134,7 +135,7 @@ elif menu == "🤖 Chat with AI Coach":
     st.header("🤖 Native Google AI Hypertrophy Coach")
     
     st.sidebar.markdown("---")
-    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from aistudio.google.com")
+    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from ://google.com")
     api_key = raw_key.strip()
     
     if not api_key:
@@ -159,7 +160,6 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        # FIXED: Hard separation of link and parameters. No string formatting or appending used.
                         url = "https://googleapis.com"
                         query_parameters = {"key": api_key}
                         headers = {"Content-Type": "application/json"}
@@ -175,14 +175,13 @@ elif menu == "🤖 Chat with AI Coach":
                             ]
                         }
                         
-                        # Python's 'requests' will automatically attach your key query format perfectly
                         response = requests.post(url, params=query_parameters, json=payload, headers=headers)
                         
                         if response.status_code != 200:
                             ai_reply = f"Google Server Error ({response.status_code}). Details: {response.text}"
                         else:
                             res_data = response.json()
-                            ai_reply = res_data["candidates"]["content"]["parts"]["text"]
+                            ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
                         
                         st.write(ai_reply)
                         st.session_state.messages.append({"role": "assistant", "content": ai_reply})
