@@ -1,19 +1,45 @@
 import streamlit as st
 import datetime
 import time
+import os
+import pandas as pd
+from g4f.client import Client  # Fully free, zero-key AI routing library
 
 # Page Layout Configuration
 st.set_page_config(page_title="HyperCustom Fit", layout="wide", page_icon="🏋️‍♂️")
 st.title("🏋️‍♂️ HyperCustom Fit Tracker")
 
-# App Database Buffering
-if "history" not in st.session_state:
-    st.session_state.history = []
+# ────────────────────────────────────────────────────────
+# PERSISTENT DATABASE SYSTEM
+# ────────────────────────────────────────────────────────
+DB_FILE = "workout_database.csv"
+
+def save_set_to_csv(date_str, routine_name, exercise_name, set_num, weight, reps):
+    new_row = pd.DataFrame([{
+        "Date": date_str,
+        "Routine": routine_name,
+        "Exercise": exercise_name,
+        "Set": set_num,
+        "Weight_lbs": weight,
+        "Reps": reps
+    }])
+    if not os.path.exists(DB_FILE):
+        new_row.to_csv(DB_FILE, index=False)
+    else:
+        new_row.to_csv(DB_FILE, mode='a', header=False, index=False)
+
+def load_workout_history():
+    if os.path.exists(DB_FILE):
+        try:
+            return pd.read_csv(DB_FILE)
+        except:
+            return pd.DataFrame()
+    return pd.DataFrame()
 
 # Navigation Sidebar
-menu = st.sidebar.radio("Menu", ["📝 Log Today's Lift", "📈 View Training Logs"])
+menu = st.sidebar.radio("Menu", ["📝 Log Today's Lift", "📈 View Training Logs", "🤖 Chat with AI Coach"])
 
-# Programming Schedule Matched to your Home Setup
+# Training Program Matrix
 routine = {
     "Day 1: Upper Focus": [
         {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3},
@@ -44,57 +70,102 @@ if menu == "📝 Log Today's Lift":
     st.header("Log Today's Workout")
     selected_day = st.selectbox("Choose Routine:", list(routine.keys()))
     
-    # PREMIUM FEATURE: REST TIMER
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 45], format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
         status_text = st.sidebar.empty()
-        
         for percent_complete in range(100):
             time.sleep(duration / 100)
             progress_bar.progress(percent_complete + 1)
             remaining = int(duration - (duration * (percent_complete / 100)))
             status_text.caption(f"⏳ {remaining}s remaining... Rest!")
-            
         status_text.success("🚨 Time's Up! Begin your next set.")
         st.sidebar.balloons()
     
-    logged_data = []
+    workout_inputs = {}
     for ex in routine[selected_day]:
         st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})*")
         cols = st.columns(ex['sets'])
         
-        ex_sets = []
+        ex_inputs = []
         for i in range(ex['sets']):
             with cols[i]:
                 st.caption(f"Set {i+1}")
                 weight = st.number_input(f"Wt (lbs)", min_value=0.0, step=2.5, key=f"{ex['name']}_w_{i}")
                 reps = st.number_input(f"Reps", min_value=0, step=1, key=f"{ex['name']}_r_{i}")
-                ex_sets.append({"set": i+1, "weight": weight, "reps": reps})
-        logged_data.append({"exercise": ex['name'], "sets": ex_sets})
+                ex_inputs.append((i+1, weight, reps))
+        workout_inputs[ex['name']] = ex_inputs
         st.write("---")
         
     if st.button("Save Workout to History", type="primary"):
-        log_entry = {
-            "date": datetime.date.today().strftime("%b %d, %Y"),
-            "routine": selected_day,
-            "data": logged_data
-        }
-        st.session_state.history.append(log_entry)
-        st.success("💪 Workout logged! Go to 'View Training Logs' to check progress.")
+        today_str = datetime.date.today().strftime("%b %d, %Y")
+        for ex_name, sets_data in workout_inputs.items():
+            for set_num, weight, reps in sets_data:
+                save_set_to_csv(today_str, selected_day, ex_name, set_num, weight, reps)
+        st.success("💪 Workout securely written to permanent database memory!")
 
 # --- SCREEN 2: PROGRESS LOGS ---
 elif menu == "📈 View Training Logs":
     st.header("Your Completed Workouts")
-    if not st.session_state.history:
-        st.warning("No logged sessions found. Try completing a workout row under the log page first!")
+    history_df = load_workout_history()
+    
+    if history_df.empty:
+        st.warning("No logged sessions found in your permanent storage file yet.")
     else:
-        for entry in reversed(st.session_state.history):
-            with st.expander(f"📅 {entry['date']} — {entry['routine']}"):
-                for ex in entry['data']:
-                    st.write(f"**{ex['exercise']}**")
-                    set_str = " | ".join([f"Set {s['set']}: {s['weight']}lbs x {s['reps']} reps" for s in ex['sets']])
-                    st.caption(set_str)
+        unique_dates = history_df["Date"].unique()[::-1]
+        for target_date in unique_dates:
+            date_df = history_df[history_df["Date"] == target_date]
+            routine_name = date_df["Routine"].iloc[0]
+            
+            with st.expander(f"📅 {target_date} — {routine_name}"):
+                for ex_name in date_df["Exercise"].unique():
+                    st.write(f"**{ex_name}**")
+                    ex_df = date_df[date_df["Exercise"] == ex_name]
+                    set_strings = []
+                    for _, row in ex_df.iterrows():
+                        set_strings.append(f"Set {int(row['Set'])}: {row['Weight_lbs']}lbs x {int(row['Reps'])} reps")
+                    st.caption(" | ".join(set_strings))
+
+# --- SCREEN 3: FREE AI COACH ASSISTANT ---
+elif menu == "🤖 Chat with AI Coach":
+    st.header("🤖 Your Free AI Hypertrophy Coach")
+    st.caption("Ask anything about your home gym gear, form adjustments, or muscle building tactics.")
+    
+    # Keep chat history in app cache
+    if "messages" not in st.session_state:
+        st.session_state.messages = [
+            {"role": "assistant", "content": "Hey! I'm your hypertrophy coach. Ask me questions about adjusting your weights, changing exercises, or hitting failure safely!"}
+        ]
+        
+    # Render historical chat items cleanly
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+            
+    # Process fresh text submission
+    if prompt := st.chat_input("Ex: My shoulders hurt on bench press, what should I swap it with?"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.write(prompt)
+            
+        with st.chat_message("assistant"):
+            with st.spinner("Analyzing training parameters..."):
+                try:
+                    # Instantiates a clean open-source AI call pipeline
+                    client = Client()
+                    response = client.chat.completions.create(
+                        model="gpt-4o",
+                        messages=[
+                            {"role": "system", "content": "You are an elite, highly encouraging fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."},
+                            {"role": "user", "content": prompt}
+                        ]
+                    )
+                    ai_reply = response.choices[0].message.content
+                except Exception as e:
+                    ai_reply = "Hey, my main server connection is a bit slow right now. Make sure your weight targets allow you to hit 1-2 Reps in Reserve (RIR) to maximize muscle building safely!"
+                
+                st.write(ai_reply)
+                st.session_state.messages.append({"role": "assistant", "content": ai_reply})
