@@ -72,7 +72,6 @@ if menu == "📝 Log Today's Lift":
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    # FIXED LINE: Removed the duplicate comma sequence
     duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
@@ -135,7 +134,9 @@ elif menu == "🤖 Chat with AI Coach":
     st.header("🤖 Native Google AI Hypertrophy Coach")
     
     st.sidebar.markdown("---")
-    api_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from ://google.com")
+    # Clean up key whitespace strings automatically
+    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from ://google.com")
+    api_key = raw_key.strip()
     
     if not api_key:
         st.info("👈 Please paste your free Google Gemini API Key into the sidebar slot to open the live chat channel.")
@@ -159,7 +160,9 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        url = f"https://googleapis.com{api_key}"
+                        # FIXED LINE: Added explicit string structure with correct parameter mapping
+                        url = "https://googleapis.com"
+                        params = {"key": api_key}
                         headers = {"Content-Type": "application/json"}
                         
                         system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
@@ -167,7 +170,7 @@ elif menu == "🤖 Chat with AI Coach":
                             "contents": [{"parts": [{"text": f"Context: {system_context}\n\nUser Question: {prompt}"}]}]
                         }
                         
-                        response = requests.post(url, json=payload, headers=headers)
+                        response = requests.post(url, params=params, json=payload, headers=headers)
                         res_data = response.json()
                         ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
                         
@@ -176,3 +179,4 @@ elif menu == "🤖 Chat with AI Coach":
                     
                     st.write(ai_reply)
                     st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+                    
