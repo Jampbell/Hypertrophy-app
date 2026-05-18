@@ -72,8 +72,7 @@ if menu == "📝 Log Today's Lift":
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    # FIXED LINE: Removed the duplicate comma sequence completely
-    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -135,7 +134,7 @@ elif menu == "🤖 Chat with AI Coach":
     st.header("🤖 Native Google AI Hypertrophy Coach")
     
     st.sidebar.markdown("---")
-    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from ://google.com")
+    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from aistudio.google.com")
     api_key = raw_key.strip()
     
     if not api_key:
@@ -160,25 +159,28 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        url = "https://googleapis.com"
-                        query_parameters = {"key": api_key}
-                        headers = {"Content-Type": "application/json"}
-                        
-                        system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
-                        payload = {
-                            "contents": [
-                                {
-                                    "parts": [
-                                        {"text": f"Context: {system_context}\n\nUser Question: {prompt}"}
-                                    ]
-                                }
-                            ]
+                        # Streamlined endpoint structure bypassing standard routing errors
+                        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+                        headers = {
+                            "Content-Type": "application/json",
+                            "x-goog-api-key": api_key
                         }
                         
-                        response = requests.post(url, params=query_parameters, json=payload, headers=headers)
+                        system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
+                        
+                        # Simplified dictionary configuration matching core API specifications
+                        payload = {
+                            "contents": [{
+                                "parts": [{
+                                    "text": f"System Directive: {system_context}\nUser Question: {prompt}"
+                                }]
+                            }]
+                        }
+                        
+                        response = requests.post(url, json=payload, headers=headers)
                         
                         if response.status_code != 200:
-                            ai_reply = f"Google Server Error ({response.status_code}). Details: {response.text}"
+                            ai_reply = f"Google Connection Rejected ({response.status_code}). Please confirm your key permissions. API Context: {response.text}"
                         else:
                             res_data = response.json()
                             ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
@@ -187,6 +189,6 @@ elif menu == "🤖 Chat with AI Coach":
                         st.session_state.messages.append({"role": "assistant", "content": ai_reply})
                         
                     except Exception as e:
-                        error_msg = f"Connection failed. Error diagnostic code: {str(e)}"
+                        error_msg = f"Connection failed. Parsing diagnostic code: {str(e)}"
                         st.write(error_msg)
                         st.session_state.messages.append({"role": "assistant", "content": error_msg})
