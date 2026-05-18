@@ -159,9 +159,8 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        # MODIFIED MODEL ENTRY: Migrated route name from 1.5-flash to 2.5-flash to stop 404 blockages
-                        url = "https://googleapis.com"
-                        params = {"key": api_key}
+                        # RESTORED ACTION PATH: Hardcoded correct model text right into the destination URL link string
+                        url = f"https://googleapis.com{api_key}"
                         headers = {"Content-Type": "application/json"}
                         
                         system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
@@ -175,7 +174,7 @@ elif menu == "🤖 Chat with AI Coach":
                             ]
                         }
                         
-                        response = requests.post(url, params=params, json=payload, headers=headers)
+                        response = requests.post(url, json=payload, headers=headers)
                         
                         if response.status_code != 200:
                             ai_reply = f"Google Server Error ({response.status_code}). Please confirm your API key is correctly pasted and active at aistudio.google.com. Error detail: {response.text}"
@@ -187,4 +186,4 @@ elif menu == "🤖 Chat with AI Coach":
                         ai_reply = f"Connection failed. Please confirm your API key is active. Error diagnostic code: {str(e)}"
                     
                     st.write(ai_reply)
-                    st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+                    st.session_state.messages.append({"role": "assistant", "content": api_reply})
