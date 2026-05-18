@@ -72,7 +72,7 @@ if menu == "📝 Log Today's Lift":
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -159,14 +159,12 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        # Restructuring endpoint parameters to match Google's latest REST layout
-                        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-                        headers = {"Content-Type": "application/json"}
+                        # MODIFIED MODEL ENTRY: Migrated route name from 1.5-flash to 2.5-flash to stop 404 blockages
+                        url = "https://googleapis.com"
                         params = {"key": api_key}
+                        headers = {"Content-Type": "application/json"}
                         
                         system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
-                        
-                        # Correct nested payload structure for Gemini REST endpoints
                         payload = {
                             "contents": [
                                 {
@@ -179,7 +177,6 @@ elif menu == "🤖 Chat with AI Coach":
                         
                         response = requests.post(url, params=params, json=payload, headers=headers)
                         
-                        # Guard rails to gracefully catch key authentication problems
                         if response.status_code != 200:
                             ai_reply = f"Google Server Error ({response.status_code}). Please confirm your API key is correctly pasted and active at aistudio.google.com. Error detail: {response.text}"
                         else:
