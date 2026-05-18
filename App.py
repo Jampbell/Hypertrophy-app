@@ -72,7 +72,7 @@ if menu == "📝 Log Today's Lift":
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -134,7 +134,7 @@ elif menu == "🤖 Chat with AI Coach":
     st.header("🤖 Native Google AI Hypertrophy Coach")
     
     st.sidebar.markdown("---")
-    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from aistudio.google.com")
+    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from ://google.com")
     api_key = raw_key.strip()
     
     if not api_key:
@@ -159,7 +159,6 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        # RESTORED ACTION PATH: Hardcoded correct model text right into the destination URL link string
                         url = f"https://googleapis.com{api_key}"
                         headers = {"Content-Type": "application/json"}
                         
@@ -177,13 +176,16 @@ elif menu == "🤖 Chat with AI Coach":
                         response = requests.post(url, json=payload, headers=headers)
                         
                         if response.status_code != 200:
-                            ai_reply = f"Google Server Error ({response.status_code}). Please confirm your API key is correctly pasted and active at aistudio.google.com. Error detail: {response.text}"
+                            ai_reply = f"Google Server Error ({response.status_code}). Please confirm your API key is correctly pasted and active at ://google.com. Error detail: {response.text}"
                         else:
                             res_data = response.json()
                             ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
                         
+                        # FIXED: Indented these lines properly inside the try block to avoid NameErrors
+                        st.write(ai_reply)
+                        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+                        
                     except Exception as e:
-                        ai_reply = f"Connection failed. Please confirm your API key is active. Error diagnostic code: {str(e)}"
-                    
-                    st.write(ai_reply)
-                    st.session_state.messages.append({"role": "assistant", "content": api_reply})
+                        error_msg = f"Connection failed. Please confirm your API key is active. Error diagnostic code: {str(e)}"
+                        st.write(error_msg)
+                        st.session_state.messages.append({"role": "assistant", "content": error_msg})
