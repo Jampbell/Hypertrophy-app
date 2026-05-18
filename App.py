@@ -134,8 +134,7 @@ elif menu == "🤖 Chat with AI Coach":
     st.header("🤖 Native Google AI Hypertrophy Coach")
     
     st.sidebar.markdown("---")
-    # Clean up key whitespace strings automatically
-    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from ://google.com")
+    raw_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from aistudio.google.com")
     api_key = raw_key.strip()
     
     if not api_key:
@@ -160,23 +159,35 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        # FIXED LINE: Added explicit string structure with correct parameter mapping
-                        url = "https://googleapis.com"
-                        params = {"key": api_key}
+                        # Restructuring endpoint parameters to match Google's latest REST layout
+                        url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
                         headers = {"Content-Type": "application/json"}
+                        params = {"key": api_key}
                         
                         system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
+                        
+                        # Correct nested payload structure for Gemini REST endpoints
                         payload = {
-                            "contents": [{"parts": [{"text": f"Context: {system_context}\n\nUser Question: {prompt}"}]}]
+                            "contents": [
+                                {
+                                    "parts": [
+                                        {"text": f"Context: {system_context}\n\nUser Question: {prompt}"}
+                                    ]
+                                }
+                            ]
                         }
                         
                         response = requests.post(url, params=params, json=payload, headers=headers)
-                        res_data = response.json()
-                        ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
+                        
+                        # Guard rails to gracefully catch key authentication problems
+                        if response.status_code != 200:
+                            ai_reply = f"Google Server Error ({response.status_code}). Please confirm your API key is correctly pasted and active at aistudio.google.com. Error detail: {response.text}"
+                        else:
+                            res_data = response.json()
+                            ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
                         
                     except Exception as e:
                         ai_reply = f"Connection failed. Please confirm your API key is active. Error diagnostic code: {str(e)}"
                     
                     st.write(ai_reply)
                     st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-                    
