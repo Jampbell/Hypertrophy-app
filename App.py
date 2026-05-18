@@ -3,7 +3,8 @@ import datetime
 import time
 import os
 import pandas as pd
-from g4f.client import Client  # Fully free, zero-key AI routing library
+import urllib.request
+import json
 
 # Page Layout Configuration
 st.set_page_config(page_title="HyperCustom Fit", layout="wide", page_icon="🏋️‍♂️")
@@ -72,7 +73,7 @@ if menu == "📝 Log Today's Lift":
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 125], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -101,6 +102,82 @@ if menu == "📝 Log Today's Lift":
         st.write("---")
         
     if st.button("Save Workout to History", type="primary"):
+        today_str = datetime.date.today().strftime("%b %d, %Y")
+        for ex_name, sets_data in workout_inputs.items():
+            for set_num, weight, reps in sets_data:
+                save_set_to_csv(today_str, selected_day, ex_name, set_num, weight, reps)
+        st.success("💪 Workout securely written to permanent database memory!")
+
+# --- SCREEN 2: PROGRESS LOGS ---
+elif menu == "📈 View Training Logs":
+    st.header("Your Completed Workouts")
+    history_df = load_workout_history()
+    
+    if history_df.empty:
+        st.warning("No logged sessions found in your permanent storage file yet.")
+    else:
+        unique_dates = history_df["Date"].unique()[::-1]
+        for target_date in unique_dates:
+            date_df = history_df[history_df["Date"] == target_date]
+            routine_name = date_df["Routine"].iloc[0]
+            
+            with st.expander(f"📅 {target_date} — {routine_name}"):
+                for ex_name in date_df["Exercise"].unique():
+                    st.write(f"**{ex_name}**")
+                    ex_df = date_df[date_df["Exercise"] == ex_name]
+                    set_strings = []
+                    for _, row in ex_df.iterrows():
+                        set_strings.append(f"Set {int(row['Set'])}: {row['Weight_lbs']}lbs x {int(row['Reps'])} reps")
+                    st.caption(" | ".join(set_strings))
+
+# --- SCREEN 3: HIGH-SPEED NATIVE GOOGLE AI ASSISTANT ---
+elif menu == "🤖 Chat with AI Coach":
+    st.header("🤖 Native Google AI Hypertrophy Coach")
+    
+    # Secure Clipboard Key Slot
+    st.sidebar.markdown("---")
+    api_key = st.sidebar.text_input("🔑 Enter Gemini API Key:", type="password", help="Paste your key from ://google.com")
+    
+    if not api_key:
+        st.info("👈 Please paste your free Google Gemini API Key into the sidebar slot to open the live chat channel.")
+    else:
+        st.caption("Ask anything about your home gym gear, form adjustments, or muscle building tactics.")
+        
+        if "messages" not in st.session_state:
+            st.session_state.messages = [
+                {"role": "assistant", "content": "Hey! I am connected natively now. Ask me anything about your 3-day split, working around home gym issues, or mapping out fatigue!"}
+            ]
+            
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                st.write(msg["content"])
+                
+        if prompt := st.chat_input("Ex: What can I use my 35lb kettlebell for on leg day?"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.write(prompt)
+                
+            with st.chat_message("assistant"):
+                with st.spinner("Connecting with Google AI Engines..."):
+                    try:
+                        # Raw HTTP Request Setup to bypass complex package installation blocks
+                        url = f"https://googleapis.com{api_key}"
+                        headers = {"Content-Type": "application/json"}
+                        
+                        system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
+                        data = {
+                            "contents": [{"parts": [{"text": f"Context: {system_context}\n\nUser Question: {prompt}"}]}]
+                        }
+                        
+                        req = urllib.request.Request(url, data=json.dumps(data).encode("utf-8"), headers=headers)
+                        with urllib.request.urlopen(req) as response:
+                            res_data = json.loads(response.read().decode("utf-8"))
+                            ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
+                    except Exception as e:
+                        ai_reply = f"Connection failed. Please confirm your API key is active. Error diagnostic code: {str(e)}"
+                    
+                    st.write(ai_reply)
+                    st.session_state.messages.append({"role": "assistant", "content": ai_reply})
         today_str = datetime.date.today().strftime("%b %d, %Y")
         for ex_name, sets_data in workout_inputs.items():
             for set_num, weight, reps in sets_data:
