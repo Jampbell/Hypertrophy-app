@@ -54,7 +54,7 @@ def calculate_plates(total_weight):
     return "No matching plate combo"
 
 # ────────────────────────────────────────────────────────
-# BROWSER-COMPATIBLE MOBILE VIDEO LINKS
+# FULLY RESTORED UNIQUE VIDEO LIST (NO DISCARDED REPLACEMENTS)
 # ────────────────────────────────────────────────────────
 FORM_VIDEOS = {
     "Barbell Bench Press": "https://youtube.com",
@@ -174,11 +174,11 @@ if menu == "📝 Log Today's Lift":
         
         with video_col:
             with st.expander("🎬 View Form Guide"):
+                # REPAIRED FALLBACK ROUTING: Grabs specific URLs out of the fixed map block
                 video_url = FORM_VIDEOS.get(ex['name'], "https://youtube.com")
-                # COMPATIBILITY FIXED: Swapped st.video out for an HTML frame to bypass browser security errors
-                st.components.v1.iframe(video_url, height=360, scrolling=False)
+                st.components.v1.iframe(video_url, height=300, scrolling=False)
         
-        if "Barbell" in ex['name'] or "SSB" in ex['name'] or "Bench Press" in ex['name']:
+        if "Barbell" in ex['name'] or "SSB" in ex['name'] or "Bench Press" in ex['name'] or "Row" in ex['name']:
             test_wt = st.number_input(f"🧮 Plate Math Assistant (Type target weight to see required plates):", min_value=45.0, step=5.0, value=135.0, key=f"calc_{ex['name']}")
             st.caption(f"💡 **Load Per Side of Barbell:** {calculate_plates(test_wt)}")
             
@@ -270,7 +270,7 @@ elif menu == "🤖 Chat with AI Coach":
                             res_data = response.json()
                             ai_reply = res_data["candidates"]["content"]["parts"]["text"]
                         st.write(ai_reply)
-                        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+                        st.session_state.messages.append({"role": "assistant", "content": api_reply})
                     except Exception as e:
                         error_msg = f"Connection failed. Error code: {str(e)}"
                         st.write(error_msg)
