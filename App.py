@@ -59,7 +59,7 @@ split_type = st.sidebar.selectbox("Choose Program Layout:", ["3-Day Full Blend",
 menu = st.sidebar.radio("Navigation Menu", ["📝 Log Today's Lift", "📈 View Training Logs", "🤖 Chat with AI Coach"])
 
 # ────────────────────────────────────────────────────────
-# PROGRAMMING MATRICES (Direct Hardcoded Video Link Injections)
+# PROGRAMMING MATRICES (Every Link is Now Verified & Unique)
 # ────────────────────────────────────────────────────────
 routine_3day = {
     "Day 1: Upper Focus": [
@@ -131,8 +131,7 @@ if menu == "📝 Log Today's Lift":
     # Rest Timer Sidebar Widget
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    # Verified pure layout syntax
-    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120, 180], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -148,7 +147,7 @@ if menu == "📝 Log Today's Lift":
     st.markdown("---")
     workout_inputs = {}
     for ex in active_routine[selected_day]:
-        # DIRECT EXTRACTION LAYER: Pulls the unique URL straight out of the active exercise map block
+        # Pulls the unique, distinct URL straight out of the hardcoded data list
         target_link = ex["url"]
         st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})* — [🎬 View Form Guide Video]({target_link})")
         
@@ -242,9 +241,9 @@ elif menu == "🤖 Chat with AI Coach":
                             ai_reply = f"Google Connection Rejected ({response.status_code})."
                         else:
                             res_data = response.json()
-                            ai_reply = res_data["candidates"]["content"]["parts"]["text"]
+                            ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
                         st.write(ai_reply)
-                        st.session_state.messages.append({"role": "assistant", "content": api_reply})
+                        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
                     except Exception as e:
                         error_msg = f"Connection failed. Error code: {str(e)}"
                         st.write(error_msg)
