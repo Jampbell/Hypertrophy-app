@@ -152,7 +152,8 @@ if menu == "📝 Log Today's Lift":
     # Rest Timer Sidebar Widget
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:",, index=1, format_func=lambda x: f"{x} Seconds")
+    # FIXED LINE: Removed the duplicate comma sequence completely
+    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -168,8 +169,7 @@ if menu == "📝 Log Today's Lift":
     st.markdown("---")
     workout_inputs = {}
     for ex in active_routine[selected_day]:
-        # FIXED DISPLAY LAYER: Markdown generation provides clean hyperlink execution paths on mobile
-        video_url = FORM_VIDEOS.get(ex['name'], "https://www.youtube.com")
+        video_url = FORM_VIDEOS.get(ex['name'], "https://youtube.com")
         st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})* — [🎬 View Form Guide Video]({video_url})")
         
         if "Barbell" in ex['name'] or "SSB" in ex['name'] or "Bench Press" in ex['name'] or "Row" in ex['name']:
@@ -205,7 +205,7 @@ elif menu == "📈 View Training Logs":
         unique_dates = history_df["Date"].unique()[::-1]
         for target_date in unique_dates:
             date_df = history_df[history_df["Date"] == target_date]
-            routine_name = date_df["Routine"].iloc
+            routine_name = date_df["Routine"].iloc[0]
             
             with st.expander(f"📅 {target_date} — {routine_name}"):
                 for ex_name in date_df["Exercise"].unique():
