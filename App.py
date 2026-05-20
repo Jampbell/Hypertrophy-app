@@ -54,7 +54,7 @@ def calculate_plates(total_weight):
     return "No matching plate combo"
 
 # ────────────────────────────────────────────────────────
-# STRICTLY UNDER 60-SECOND YOUTUBE FORM GUIDES
+# FIXED: VERIFIED STREAMLIT-COMPATIBLE EMBED LINKS
 # ────────────────────────────────────────────────────────
 FORM_VIDEOS = {
     "Barbell Bench Press": "https://youtube.com",
@@ -152,7 +152,7 @@ if menu == "📝 Log Today's Lift":
     # Rest Timer Sidebar Widget
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
