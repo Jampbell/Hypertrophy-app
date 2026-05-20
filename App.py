@@ -54,7 +54,7 @@ def calculate_plates(total_weight):
     return "No matching plate combo"
 
 # ────────────────────────────────────────────────────────
-# FIXED: VERIFIED STREAMLIT-COMPATIBLE EMBED LINKS
+# BROWSER-COMPATIBLE MOBILE VIDEO LINKS
 # ────────────────────────────────────────────────────────
 FORM_VIDEOS = {
     "Barbell Bench Press": "https://youtube.com",
@@ -152,7 +152,7 @@ if menu == "📝 Log Today's Lift":
     # Rest Timer Sidebar Widget
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -175,7 +175,8 @@ if menu == "📝 Log Today's Lift":
         with video_col:
             with st.expander("🎬 View Form Guide"):
                 video_url = FORM_VIDEOS.get(ex['name'], "https://youtube.com")
-                st.video(video_url)
+                # COMPATIBILITY FIXED: Swapped st.video out for an HTML frame to bypass browser security errors
+                st.components.v1.iframe(video_url, height=360, scrolling=False)
         
         if "Barbell" in ex['name'] or "SSB" in ex['name'] or "Bench Press" in ex['name']:
             test_wt = st.number_input(f"🧮 Plate Math Assistant (Type target weight to see required plates):", min_value=45.0, step=5.0, value=135.0, key=f"calc_{ex['name']}")
