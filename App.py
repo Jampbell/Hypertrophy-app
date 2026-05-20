@@ -54,7 +54,7 @@ def calculate_plates(total_weight):
     return "No matching plate combo"
 
 # ────────────────────────────────────────────────────────
-# MOBILE-FRIENDLY YOUTUBE SHORTS LINK MAP
+# MOBILE APP REDIRECT PROVEN LINKS (NO CHOPPED LINKS)
 # ────────────────────────────────────────────────────────
 FORM_VIDEOS = {
     "Barbell Bench Press": "https://youtube.com",
@@ -152,7 +152,7 @@ if menu == "📝 Log Today's Lift":
     # Rest Timer Sidebar Widget
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    duration = st.sidebar.selectbox("Select Break Length:",, index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -168,14 +168,9 @@ if menu == "📝 Log Today's Lift":
     st.markdown("---")
     workout_inputs = {}
     for ex in active_routine[selected_day]:
-        title_col, video_col = st.columns([3, 1])
-        with title_col:
-            st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})*")
-        
-        with video_col:
-            video_url = FORM_VIDEOS.get(ex['name'], "https://youtube.com")
-            # FIXED: Uses a link button wrapper to guarantee smooth execution on all Android/iOS screens
-            st.link_button("🎬 Form Guide", video_url, use_container_width=True)
+        # FIXED DISPLAY LAYER: Markdown generation provides clean hyperlink execution paths on mobile
+        video_url = FORM_VIDEOS.get(ex['name'], "https://www.youtube.com")
+        st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})* — [🎬 View Form Guide Video]({video_url})")
         
         if "Barbell" in ex['name'] or "SSB" in ex['name'] or "Bench Press" in ex['name'] or "Row" in ex['name']:
             test_wt = st.number_input(f"🧮 Plate Math Assistant (Type target weight to see required plates):", min_value=45.0, step=5.0, value=135.0, key=f"calc_{ex['name']}")
@@ -210,7 +205,7 @@ elif menu == "📈 View Training Logs":
         unique_dates = history_df["Date"].unique()[::-1]
         for target_date in unique_dates:
             date_df = history_df[history_df["Date"] == target_date]
-            routine_name = date_df["Routine"].iloc[0]
+            routine_name = date_df["Routine"].iloc
             
             with st.expander(f"📅 {target_date} — {routine_name}"):
                 for ex_name in date_df["Exercise"].unique():
@@ -269,7 +264,7 @@ elif menu == "🤖 Chat with AI Coach":
                             res_data = response.json()
                             ai_reply = res_data["candidates"]["content"]["parts"]["text"]
                         st.write(ai_reply)
-                        st.session_state.messages.append({"role": "assistant", "content": ai_reply})
+                        st.session_state.messages.append({"role": "assistant", "content": api_reply})
                     except Exception as e:
                         error_msg = f"Connection failed. Error code: {str(e)}"
                         st.write(error_msg)
