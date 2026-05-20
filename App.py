@@ -53,83 +53,62 @@ def calculate_plates(total_weight):
         return " + ".join(plates_needed)
     return "No matching plate combo"
 
-# ────────────────────────────────────────────────────────
-# MOBILE APP REDIRECT PROVEN LINKS (NO CHOPPED LINKS)
-# ────────────────────────────────────────────────────────
-FORM_VIDEOS = {
-    "Barbell Bench Press": "https://youtube.com",
-    "Barbell Row": "https://youtube.com",
-    "Overhead Barbell Press": "https://youtube.com",
-    "Lat Pulldowns (Cable Combo)": "https://youtube.com",
-    "Dumbbell Bicep Curls": "https://youtube.com",
-    "Tricep Cable Pushdowns": "https://youtube.com",
-    "Safety Squat Bar (SSB) Squats": "https://youtube.com",
-    "Barbell Deadlift": "https://youtube.com",
-    "Dumbbell Romanian Deadlift": "https://youtube.com",
-    "35lb Kettlebell Goblet Squats": "https://youtube.com",
-    "Calf Raises (Bench Edge)": "https://youtube.com",
-    "Incline Dumbbell Press": "https://youtube.com",
-    "Chest-Supported DB Row": "https://youtube.com",
-    "35lb Kettlebell Swings": "https://youtube.com",
-    "Dumbbell Lateral Raises": "https://youtube.com",
-    "Hammer Curls": "https://youtube.com"
-}
-
 # Sidebar Structure Setup
 st.sidebar.header("⚙️ App Preferences")
 split_type = st.sidebar.selectbox("Choose Program Layout:", ["3-Day Full Blend", "4-Day Upper/Lower Split"])
 menu = st.sidebar.radio("Navigation Menu", ["📝 Log Today's Lift", "📈 View Training Logs", "🤖 Chat with AI Coach"])
 
-# 3-Day Programming Schedule Matrix
+# ────────────────────────────────────────────────────────
+# PROGRAMMING MATRICES (Direct Hardcoded Video Link Injections)
+# ────────────────────────────────────────────────────────
 routine_3day = {
     "Day 1: Upper Focus": [
-        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3},
-        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3},
-        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3},
-        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3},
-        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3},
-        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3}
+        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"}
     ],
     "Day 2: Lower Focus": [
-        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3},
-        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2},
-        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3},
-        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3},
-        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4}
+        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2, "url": "https://youtube.com"},
+        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4, "url": "https://youtube.com"}
     ],
     "Day 3: Full Body Blend": [
-        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3},
-        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3},
-        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3},
-        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4},
-        {"name": "Hammer Curls", "range": "10-12 reps", "sets": 3}
+        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4, "url": "https://youtube.com"},
+        {"name": "Hammer Curls", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"}
     ]
 }
 
-# 4-Day Programming Schedule Matrix
 routine_4day = {
     "Day 1: Upper A": [
-        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3},
-        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3},
-        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4},
-        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3}
+        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4, "url": "https://youtube.com"},
+        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"}
     ],
     "Day 2: Lower A": [
-        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3},
-        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3},
-        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3},
-        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4}
+        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4, "url": "https://youtube.com"}
     ],
     "Day 3: Upper B": [
-        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3},
-        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3},
-        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3},
-        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3}
+        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"}
     ],
     "Day 4: Lower B": [
-        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2},
-        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3},
-        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3}
+        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2, "url": "https://youtube.com"},
+        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
+        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3, "url": "https://youtube.com"}
     ]
 }
 
@@ -152,8 +131,8 @@ if menu == "📝 Log Today's Lift":
     # Rest Timer Sidebar Widget
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Rest Break Timer")
-    # FIXED LINE: Removed the duplicate comma sequence completely
-    duration = st.sidebar.selectbox("Select Break Length:", [45, 60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
+    # Verified pure layout syntax
+    duration = st.sidebar.selectbox("Select Break Length:", [60, 90, 120], index=1, format_func=lambda x: f"{x} Seconds")
     
     if st.sidebar.button("▶️ Start Rest Timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
@@ -169,8 +148,9 @@ if menu == "📝 Log Today's Lift":
     st.markdown("---")
     workout_inputs = {}
     for ex in active_routine[selected_day]:
-        video_url = FORM_VIDEOS.get(ex['name'], "https://youtube.com")
-        st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})* — [🎬 View Form Guide Video]({video_url})")
+        # DIRECT EXTRACTION LAYER: Pulls the unique URL straight out of the active exercise map block
+        target_link = ex["url"]
+        st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})* — [🎬 View Form Guide Video]({target_link})")
         
         if "Barbell" in ex['name'] or "SSB" in ex['name'] or "Bench Press" in ex['name'] or "Row" in ex['name']:
             test_wt = st.number_input(f"🧮 Plate Math Assistant (Type target weight to see required plates):", min_value=45.0, step=5.0, value=135.0, key=f"calc_{ex['name']}")
