@@ -127,6 +127,12 @@ def to_embed(url):
     if "watch?v=" in url:
         vid = url.split("watch?v=")[-1].split("&")[0]
         return f"https://www.youtube.com/embed/{vid}?start=5&end=65"
+    if "youtu.be/" in url:
+        vid = url.split("youtu.be/")[-1].split("?")[0]
+        return f"https://www.youtube.com/embed/{vid}?start=5&end=65"
+    if "youtube.com/shorts/" in url:
+        vid = url.split("shorts/")[-1].split("?")[0].split("/")[0]
+        return f"https://www.youtube.com/embed/{vid}"
     return url
 
 
@@ -152,8 +158,17 @@ def try_apply_command(prompt: str):
 def rest_widget():
     now = time.time()
     if st.session_state.rest_end > now:
-        remaining = int(st.session_state.rest_end - now)
-        st.info(f"⏱️ Rest running: {remaining}s remaining")
+        remaining = max(0, int(st.session_state.rest_end - now))
+        with st.container(border=True):
+            c1, c2 = st.columns([3, 1])
+            c1.markdown(f"### ⏱️ Rest: **{remaining}s**")
+            if c2.button("✖ Dismiss", key="dismiss_rest"):
+                st.session_state.rest_end = 0.0
+                st.rerun()
+            st.progress(1 - (remaining / max(st.session_state.rest_seconds, 1)))
+            st.caption("This timer stays visible while you scroll this section.")
+        time.sleep(1)
+        st.rerun()
     elif st.session_state.rest_end != 0:
         st.success("✅ Rest complete. Start next set.")
         st.session_state.rest_end = 0.0
@@ -199,6 +214,9 @@ elif view == "Program Builder":
 elif view == "Workout":
     st.subheader(f"Workout · {chosen_program}")
     rest_widget()
+    with st.expander("Rest timer controls", expanded=False):
+        st.session_state.rest_seconds = st.select_slider("Rest duration", options=[45, 60, 75, 90, 120, 150, 180], value=st.session_state.rest_seconds)
+        st.caption("Timer auto-starts after each logged set.")
     day = st.selectbox("Choose workout day", list(adapted.keys()))
 
     for idx, (ex, rr, sets, swapped) in enumerate(adapted[day], start=1):
@@ -224,7 +242,9 @@ elif view == "Workout":
                                   "Exercise": ex, "Set": s, "Weight_lbs": wt, "Reps": reps, "RIR": rir, "Volume": wt * reps})
                         st.session_state.rest_end = time.time() + st.session_state.rest_seconds
                         st.success(f"Logged {ex} set {s}. Rest started.")
-            st.video(to_embed(EXERCISE_LIBRARY[ex]["url"]))
+            demo_url = EXERCISE_LIBRARY[ex]["url"]
+            st.video(to_embed(demo_url))
+            st.caption(f"If video fails, open directly: {demo_url}")
 
 elif view == "History":
     st.subheader("History")
@@ -237,6 +257,7 @@ elif view == "Exercise Library":
             st.write(f"Required: {', '.join(meta['equipment']) if meta['equipment'] else 'None'}")
             st.write(f"Fallbacks: {', '.join(meta['fallback']) if meta['fallback'] else 'None'}")
             st.video(to_embed(meta["url"]))
+            st.caption(f"Open source: {meta['url']}")
 
 elif view == "AI Coach":
     st.subheader("AI Coach")
@@ -256,7 +277,12 @@ elif view == "AI Coach":
                 equipment_text = ", ".join(st.session_state.selected_equipment)
                 payload = {"contents": [{"parts": [{"text": f"You are a coach. User equipment: {equipment_text}. Program: {chosen_program}. Question: {prompt}"}]}]}
                 response = requests.post(GEMINI_API_URL, json=payload, headers={"Content-Type": "application/json"}, params={"key": api_key}, timeout=20)
-                if response.status_code != 200:
+                if response.status_code == 429:
+                    reply = (
+                        "You hit Gemini free-tier quota (429). Try again later, reduce message frequency, "
+                        "or create a new API key/project with available quota. I can still run local app commands here."
+                    )
+                elif response.status_code != 200:
                     reply = f"Connection rejected ({response.status_code}): {response.text[:200]}"
                 else:
                     reply = response.json()["candidates"][0]["content"]["parts"][0]["text"]
