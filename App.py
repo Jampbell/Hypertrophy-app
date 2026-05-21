@@ -13,6 +13,7 @@ st.title("🏋️‍♂️ HyperCustom Fit Tracker")
 # PERSISTENT DATABASE SYSTEM
 # ────────────────────────────────────────────────────────
 DB_FILE = "workout_database.csv"
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
 def save_set_to_csv(date_str, routine_name, exercise_name, set_num, weight, reps):
     new_row = pd.DataFrame([{
@@ -35,6 +36,17 @@ def load_workout_history():
         except:
             return pd.DataFrame()
     return pd.DataFrame()
+
+
+def youtube_embed_url(url: str) -> str:
+    """Convert common YouTube URLs to a Streamlit-friendly embed URL."""
+    if "youtube.com/watch?v=" in url:
+        video_id = url.split("watch?v=")[-1].split("&")[0]
+        return f"https://www.youtube.com/embed/{video_id}"
+    if "youtu.be/" in url:
+        video_id = url.split("youtu.be/")[-1].split("?")[0]
+        return f"https://www.youtube.com/embed/{video_id}"
+    return url
 
 # ────────────────────────────────────────────────────────
 # HELPER MATH: PLATE CALCULATOR
@@ -63,52 +75,52 @@ menu = st.sidebar.radio("Navigation Menu", ["📝 Log Today's Lift", "📈 View 
 # ────────────────────────────────────────────────────────
 routine_3day = {
     "Day 1: Upper Focus": [
-        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"}
+        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=rT7DgCr-3pg"},
+        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=vT2GjY_Umpw"},
+        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=2yjwXTZQDDI"},
+        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=CAwf7n6Luuc"},
+        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=ykJmrZ5v0Oo"},
+        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=2-LAMcpzODU"}
     ],
     "Day 2: Lower Focus": [
-        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2, "url": "https://youtube.com"},
-        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4, "url": "https://youtube.com"}
+        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=5MTEf2hP9PY"},
+        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2, "url": "https://www.youtube.com/watch?v=op9kVnSso6Q"},
+        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=0zG7o6hR0dQ"},
+        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=6xwGFn-J_QM"},
+        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4, "url": "https://www.youtube.com/watch?v=-M4-G8p8fmc"}
     ],
     "Day 3: Full Body Blend": [
-        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4, "url": "https://youtube.com"},
-        {"name": "Hammer Curls", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"}
+        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=8iPEnn-ltC8"},
+        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=5PoEksoJNaw"},
+        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=YSxHifyI6s8"},
+        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4, "url": "https://www.youtube.com/watch?v=3VcKaXpzqRo"},
+        {"name": "Hammer Curls", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=zC3nLlEvin4"}
     ]
 }
 
 routine_4day = {
     "Day 1: Upper A": [
-        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4, "url": "https://youtube.com"},
-        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"}
+        {"name": "Barbell Bench Press", "range": "8-10 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=rT7DgCr-3pg"},
+        {"name": "Barbell Row", "range": "8-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=vT2GjY_Umpw"},
+        {"name": "Dumbbell Lateral Raises", "range": "12-15 reps", "sets": 4, "url": "https://www.youtube.com/watch?v=3VcKaXpzqRo"},
+        {"name": "Dumbbell Bicep Curls", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=ykJmrZ5v0Oo"}
     ],
     "Day 2: Lower A": [
-        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4, "url": "https://youtube.com"}
+        {"name": "Safety Squat Bar (SSB) Squats", "range": "8-10 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=5MTEf2hP9PY"},
+        {"name": "Dumbbell Romanian Deadlift", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=0zG7o6hR0dQ"},
+        {"name": "35lb Kettlebell Goblet Squats", "range": "12-15 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=6xwGFn-J_QM"},
+        {"name": "Calf Raises (Bench Edge)", "range": "15 reps", "sets": 4, "url": "https://www.youtube.com/watch?v=-M4-G8p8fmc"}
     ],
     "Day 3: Upper B": [
-        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3, "url": "https://youtube.com"}
+        {"name": "Overhead Barbell Press", "range": "8-10 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=2yjwXTZQDDI"},
+        {"name": "Lat Pulldowns (Cable Combo)", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=CAwf7n6Luuc"},
+        {"name": "Incline Dumbbell Press", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=8iPEnn-ltC8"},
+        {"name": "Tricep Cable Pushdowns", "range": "12-15 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=2-LAMcpzODU"}
     ],
     "Day 4: Lower B": [
-        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2, "url": "https://youtube.com"},
-        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3, "url": "https://youtube.com"},
-        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3, "url": "https://youtube.com"}
+        {"name": "Barbell Deadlift", "range": "6-8 reps", "sets": 2, "url": "https://www.youtube.com/watch?v=op9kVnSso6Q"},
+        {"name": "Chest-Supported DB Row", "range": "10-12 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=5PoEksoJNaw"},
+        {"name": "35lb Kettlebell Swings", "range": "15-20 reps", "sets": 3, "url": "https://www.youtube.com/watch?v=YSxHifyI6s8"}
     ]
 }
 
@@ -149,7 +161,9 @@ if menu == "📝 Log Today's Lift":
     for ex in active_routine[selected_day]:
         # Pulls the unique, distinct URL straight out of the hardcoded data list
         target_link = ex["url"]
-        st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})* — [🎬 View Form Guide Video]({target_link})")
+        st.markdown(f"#### 🔹 {ex['name']} *({ex['range']})* — [🎬 Open on YouTube]({target_link})")
+        with st.expander(f"▶️ Watch {ex['name']} form demo here"):
+            st.video(youtube_embed_url(target_link))
         
         if "Barbell" in ex['name'] or "SSB" in ex['name'] or "Bench Press" in ex['name'] or "Row" in ex['name']:
             test_wt = st.number_input(f"🧮 Plate Math Assistant (Type target weight to see required plates):", min_value=45.0, step=5.0, value=135.0, key=f"calc_{ex['name']}")
@@ -225,7 +239,7 @@ elif menu == "🤖 Chat with AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Connecting with Google AI Engines..."):
                     try:
-                        url = "https://googleapis.com"
+                        url = GEMINI_API_URL
                         query_parameters = {"key": api_key}
                         headers = {"Content-Type": "application/json"}
                         system_context = "You are an elite fitness coach specializing in bodybuilding and hypertrophy training for home gym lifters. Keep answers concise, clear, and action-focused."
@@ -236,7 +250,7 @@ elif menu == "🤖 Chat with AI Coach":
                                 }]
                             }]
                         }
-                        response = requests.post(url, json=payload, headers=headers, params=query_parameters)
+                        response = requests.post(url, json=payload, headers=headers, params=query_parameters, timeout=20)
                         if response.status_code != 200:
                             ai_reply = f"Google Connection Rejected ({response.status_code})."
                         else:
@@ -244,7 +258,7 @@ elif menu == "🤖 Chat with AI Coach":
                             ai_reply = res_data["candidates"][0]["content"]["parts"][0]["text"]
                         st.write(ai_reply)
                         st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-                    except Exception as e:
-                        error_msg = f"Connection failed. Error code: {str(e)}"
+                    except requests.RequestException as e:
+                        error_msg = f"Connection failed. Network/API error: {str(e)}"
                         st.write(error_msg)
                         st.session_state.messages.append({"role": "assistant", "content": error_msg})
