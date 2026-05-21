@@ -15,13 +15,15 @@ GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMI
 
 EQUIPMENT_CATALOG = [
     "Bench", "Adjustable Bench", "Dumbbells", "Adjustable Dumbbells", "Kettlebells", "Olympic Barbell", "EZ Curl Bar",
-    "Trap Bar", "Safety Squat Bar", "Squat Rack", "Half Rack", "Power Rack", "Smith Machine", "Cable Machine",
+    "Trap Bar", "Safety Squat Bar", "Squat Rack", "Half Rack", "Power Rack", "Smith Machine", "Cable Machine", "MD-9010G Dual High Pulleys", "MD-9010G Low Pulley + Footplate",
+    "MD-9010G Butterfly Press Arms", "MD-9010G Leg Developer", "MD-9010G Preacher Curl Pad",
     "Functional Trainer", "Lat Pulldown", "Leg Press", "Leg Extension", "Leg Curl", "Pec Deck", "Dip Bars",
     "Pull-Up Bar", "Power Tower", "Resistance Bands", "Suspension Trainer", "Air Rower", "Treadmill", "Bike", "Stair Climber"
 ]
 
 PROFILE_PRESETS = {
     "Home Gym": ["Bench", "Dumbbells", "Kettlebells", "Smith Machine", "Safety Squat Bar", "EZ Curl Bar", "Air Rower", "Power Tower"],
+    "Marcy MD-9010G Custom": ["Bench", "Dumbbells", "Kettlebells", "Smith Machine", "MD-9010G Dual High Pulleys", "MD-9010G Low Pulley + Footplate", "MD-9010G Butterfly Press Arms", "MD-9010G Leg Developer", "MD-9010G Preacher Curl Pad", "Safety Squat Bar", "EZ Curl Bar", "Air Rower", "Power Tower"],
     "Commercial Gym": EQUIPMENT_CATALOG,
     "Minimal": ["Dumbbells", "Bench", "Resistance Bands"],
 }
@@ -47,6 +49,12 @@ EXERCISE_LIBRARY = {
     "Romanian Deadlift": {"equipment": ["Olympic Barbell"], "fallback": ["Dumbbell Romanian Deadlift", "EZ Bar Romanian Deadlift"], "url": "https://www.youtube.com/watch?v=2SHsk9AzdjA"},
     "Dumbbell Romanian Deadlift": {"equipment": ["Dumbbells"], "fallback": ["EZ Bar Romanian Deadlift"], "url": "https://www.youtube.com/watch?v=0zG7o6hR0dQ"},
     "EZ Bar Romanian Deadlift": {"equipment": ["EZ Curl Bar"], "fallback": ["Dumbbell Romanian Deadlift"], "url": "https://www.youtube.com/watch?v=jEy_czb3RKA"},
+
+    "Cable Crossover": {"equipment": ["MD-9010G Dual High Pulleys"], "fallback": ["Pec Deck Fly", "Dumbbell Bench Press"], "url": "https://www.youtube.com/watch?v=taI4XduLpTk"},
+    "Low Cable Row (Footplate)": {"equipment": ["MD-9010G Low Pulley + Footplate"], "fallback": ["Cable Row", "Chest-Supported DB Row"], "url": "https://www.youtube.com/watch?v=GZbfZ033f74"},
+    "Butterfly Press / Pec Fly": {"equipment": ["MD-9010G Butterfly Press Arms"], "fallback": ["Cable Crossover", "Dumbbell Bench Press"], "url": "https://www.youtube.com/watch?v=eozdVDA78K0"},
+    "Leg Extension (MD-9010G)": {"equipment": ["MD-9010G Leg Developer"], "fallback": ["Goblet Squat"], "url": "https://www.youtube.com/watch?v=YyvSfVjQeL0"},
+    "Preacher Curl (MD-9010G)": {"equipment": ["MD-9010G Preacher Curl Pad"], "fallback": ["EZ Bar Romanian Deadlift"], "url": "https://www.youtube.com/watch?v=fIWP-FRFNU0"},
 }
 
 PROGRAMS = {
@@ -266,7 +274,23 @@ elif view == "Workout":
 
 elif view == "History":
     st.subheader("History")
-    st.dataframe(history.sort_index(ascending=False), use_container_width=True) if not history.empty else st.info("No history yet.")
+    if history.empty:
+        st.info("No history yet.")
+    else:
+        edit_df = history.copy().reset_index(drop=True)
+        edit_df.insert(0, "Delete", False)
+        edited = st.data_editor(edit_df, use_container_width=True, num_rows="fixed", key="history_editor")
+        c1, c2 = st.columns(2)
+        if c1.button("Save history edits", type="primary"):
+            cleaned = edited.drop(columns=["Delete"], errors="ignore")
+            cleaned.to_csv(DB_FILE, index=False)
+            st.success("History updates saved.")
+            st.rerun()
+        if c2.button("Delete selected rows"):
+            remaining = edited[~edited["Delete"]].drop(columns=["Delete"], errors="ignore")
+            remaining.to_csv(DB_FILE, index=False)
+            st.success("Selected rows deleted.")
+            st.rerun()
 
 elif view == "Exercise Library":
     st.subheader("Exercise Library")
