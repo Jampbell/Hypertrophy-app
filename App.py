@@ -31,9 +31,9 @@ EXERCISE_LIBRARY = {
     "Smith Machine Bench Press": {"equipment": ["Smith Machine", "Bench"], "fallback": ["Dumbbell Bench Press", "Push-Up"], "url": "https://www.youtube.com/watch?v=9R4fQv1U8b0"},
     "Dumbbell Bench Press": {"equipment": ["Dumbbells", "Bench"], "fallback": ["Push-Up"], "url": "https://www.youtube.com/watch?v=VmB1G1K7v94"},
     "Push-Up": {"equipment": [], "fallback": [], "url": "https://www.youtube.com/watch?v=IODxDxX7oi4"},
-    "Barbell Row": {"equipment": ["Olympic Barbell"], "fallback": ["Chest-Supported DB Row"], "url": "https://www.youtube.com/watch?v=vT2GjY_Umpw"},
+    "Barbell Row": {"equipment": ["Olympic Barbell"], "fallback": ["Chest-Supported DB Row", "Cable Row"], "url": "https://www.youtube.com/watch?v=vT2GjY_Umpw"},
     "Chest-Supported DB Row": {"equipment": ["Dumbbells", "Bench"], "fallback": ["Cable Row"], "url": "https://www.youtube.com/watch?v=5PoEksoJNaw"},
-    "Cable Row": {"equipment": ["Cable Machine"], "fallback": ["Chest-Supported DB Row"], "url": "https://www.youtube.com/watch?v=GZbfZ033f74"},
+    "Cable Row": {"equipment": ["Cable Machine"], "fallback": ["Chest-Supported DB Row"], "url": "https://www.youtube.com/watch?v=HJSVR_67OlM"},
     "Overhead Press": {"equipment": ["Olympic Barbell", "Squat Rack"], "fallback": ["Dumbbell Shoulder Press", "Smith Machine Overhead Press"], "url": "https://www.youtube.com/watch?v=2yjwXTZQDDI"},
     "Dumbbell Shoulder Press": {"equipment": ["Dumbbells", "Bench"], "fallback": ["Smith Machine Overhead Press"], "url": "https://www.youtube.com/watch?v=qEwKCR5JCog"},
     "Smith Machine Overhead Press": {"equipment": ["Smith Machine", "Bench"], "fallback": ["Dumbbell Shoulder Press"], "url": "https://www.youtube.com/watch?v=R5JhoUX4hRQ"},
@@ -50,16 +50,27 @@ EXERCISE_LIBRARY = {
 }
 
 PROGRAMS = {
-    "3-Day Full Body": {"days": 3, "routine": {
-        "Day 1": [("Barbell Bench Press", "6-10", 3), ("Barbell Row", "8-12", 3), ("Back Squat", "6-10", 3)],
-        "Day 2": [("Overhead Press", "6-10", 3), ("Lat Pulldown", "8-12", 3), ("Romanian Deadlift", "8-12", 3)],
-        "Day 3": [("Dumbbell Bench Press", "8-12", 3), ("Chest-Supported DB Row", "10-15", 3), ("Goblet Squat", "10-15", 3)],
+    "Hypertrophy · 3-Day Full Body": {"goal": "Hypertrophy", "days": 3, "routine": {
+        "Day 1": [("Barbell Bench Press", "8-12", 3), ("Barbell Row", "8-12", 3), ("Back Squat", "8-12", 3)],
+        "Day 2": [("Overhead Press", "8-12", 3), ("Lat Pulldown", "10-15", 3), ("Romanian Deadlift", "8-12", 3)],
+        "Day 3": [("Dumbbell Bench Press", "10-15", 3), ("Chest-Supported DB Row", "10-15", 3), ("Goblet Squat", "10-15", 3)],
     }},
-    "4-Day Upper/Lower": {"days": 4, "routine": {
-        "Day 1 Upper": [("Barbell Bench Press", "6-10", 3), ("Barbell Row", "8-12", 3), ("Overhead Press", "8-12", 3)],
-        "Day 2 Lower": [("Back Squat", "6-10", 3), ("Romanian Deadlift", "8-12", 3), ("Goblet Squat", "10-15", 2)],
-        "Day 3 Upper": [("Dumbbell Bench Press", "8-12", 3), ("Lat Pulldown", "8-12", 3), ("Dumbbell Shoulder Press", "10-15", 3)],
+    "Hypertrophy · 4-Day Upper/Lower": {"goal": "Hypertrophy", "days": 4, "routine": {
+        "Day 1 Upper": [("Barbell Bench Press", "8-12", 3), ("Barbell Row", "8-12", 3), ("Dumbbell Shoulder Press", "10-15", 3)],
+        "Day 2 Lower": [("Back Squat", "8-12", 3), ("Romanian Deadlift", "8-12", 3), ("Goblet Squat", "12-15", 2)],
+        "Day 3 Upper": [("Dumbbell Bench Press", "10-15", 3), ("Lat Pulldown", "10-15", 3), ("Cable Row", "10-15", 3)],
         "Day 4 Lower": [("Safety Squat Bar Squat", "8-12", 3), ("Dumbbell Romanian Deadlift", "10-15", 3), ("Dumbbell Split Squat", "10-15", 2)],
+    }},
+    "Strength · 3-Day Full Body": {"goal": "Strength", "days": 3, "routine": {
+        "Day 1": [("Barbell Bench Press", "4-6", 4), ("Barbell Row", "5-8", 4), ("Back Squat", "4-6", 4)],
+        "Day 2": [("Overhead Press", "4-6", 4), ("Lat Pulldown", "6-8", 4), ("Romanian Deadlift", "5-8", 4)],
+        "Day 3": [("Smith Machine Bench Press", "5-8", 4), ("Cable Row", "6-8", 4), ("Safety Squat Bar Squat", "5-8", 4)],
+    }},
+    "Strength · 4-Day Upper/Lower": {"goal": "Strength", "days": 4, "routine": {
+        "Day 1 Upper": [("Barbell Bench Press", "4-6", 4), ("Barbell Row", "5-8", 4), ("Overhead Press", "4-6", 4)],
+        "Day 2 Lower": [("Back Squat", "4-6", 4), ("Romanian Deadlift", "5-8", 4), ("Goblet Squat", "8-10", 3)],
+        "Day 3 Upper": [("Smith Machine Bench Press", "5-8", 4), ("Lat Pulldown", "6-8", 4), ("Cable Row", "6-8", 4)],
+        "Day 4 Lower": [("Safety Squat Bar Squat", "5-8", 4), ("Dumbbell Romanian Deadlift", "6-10", 4), ("Dumbbell Split Squat", "8-10", 3)],
     }},
 }
 
@@ -72,6 +83,7 @@ def init_state():
     ss.setdefault("rest_end", 0.0)
     ss.setdefault("days_available", 4)
     ss.setdefault("weight_targets", {})
+    ss.setdefault("goal_mode", "Hypertrophy")
 
 
 def has_eq(ex):
@@ -98,8 +110,10 @@ def adapt_program(program_name):
     return adapted
 
 
-def recommended_program(days):
-    return "4-Day Upper/Lower" if days >= 4 else "3-Day Full Body"
+def recommended_program(days, goal):
+    if goal == "Strength":
+        return "Strength · 4-Day Upper/Lower" if days >= 4 else "Strength · 3-Day Full Body"
+    return "Hypertrophy · 4-Day Upper/Lower" if days >= 4 else "Hypertrophy · 3-Day Full Body"
 
 
 def save_set(row):
@@ -126,10 +140,10 @@ def load_history():
 def to_embed(url):
     if "watch?v=" in url:
         vid = url.split("watch?v=")[-1].split("&")[0]
-        return f"https://www.youtube.com/embed/{vid}?start=5&end=65"
+        return f"https://www.youtube.com/embed/{vid}"
     if "youtu.be/" in url:
         vid = url.split("youtu.be/")[-1].split("?")[0]
-        return f"https://www.youtube.com/embed/{vid}?start=5&end=65"
+        return f"https://www.youtube.com/embed/{vid}"
     if "youtube.com/shorts/" in url:
         vid = url.split("shorts/")[-1].split("?")[0].split("/")[0]
         return f"https://www.youtube.com/embed/{vid}"
@@ -146,6 +160,10 @@ def try_apply_command(prompt: str):
     if m:
         st.session_state.days_available = int(m.group(2))
         return f"Updated days/week to {m.group(2)}."
+    m = re.search(r"goal\s*(to|=)?\s*(strength|hypertrophy)", p)
+    if m:
+        st.session_state.goal_mode = m.group(2).capitalize()
+        return f"Updated goal mode to {st.session_state.goal_mode}."
     m = re.search(r"set weight for (.+?) to (\d+(?:\.\d+)?)", p)
     if m:
         ex = m.group(1).strip().title()
@@ -155,22 +173,13 @@ def try_apply_command(prompt: str):
     return None
 
 
-def rest_widget():
+def render_rest_inline():
     now = time.time()
     if st.session_state.rest_end > now:
         remaining = max(0, int(st.session_state.rest_end - now))
-        with st.container(border=True):
-            c1, c2 = st.columns([3, 1])
-            c1.markdown(f"### ⏱️ Rest: **{remaining}s**")
-            if c2.button("✖ Dismiss", key="dismiss_rest"):
-                st.session_state.rest_end = 0.0
-                st.rerun()
-            st.progress(1 - (remaining / max(st.session_state.rest_seconds, 1)))
-            st.caption("This timer stays visible while you scroll this section.")
-        time.sleep(1)
-        st.rerun()
+        st.caption(f"⏱️ Rest: {remaining}s")
     elif st.session_state.rest_end != 0:
-        st.success("✅ Rest complete. Start next set.")
+        st.caption("✅ Rest complete")
         st.session_state.rest_end = 0.0
 
 
@@ -187,10 +196,13 @@ with st.sidebar:
         st.session_state.selected_equipment = PROFILE_PRESETS[preset].copy()
     st.session_state.selected_equipment = st.multiselect("Your equipment", EQUIPMENT_CATALOG, default=st.session_state.selected_equipment)
 
+    st.session_state.goal_mode = st.selectbox("Training focus", ["Hypertrophy", "Strength"], index=0 if st.session_state.goal_mode == "Hypertrophy" else 1)
     st.session_state.days_available = st.slider("Days/week available", 2, 6, st.session_state.days_available)
-    suggested = recommended_program(st.session_state.days_available)
+    suggested = recommended_program(st.session_state.days_available, st.session_state.goal_mode)
+
+    candidates = [k for k, v in PROGRAMS.items() if v["goal"] == st.session_state.goal_mode]
     st.success(f"Suggested plan: {suggested}")
-    chosen_program = st.selectbox("Program", list(PROGRAMS.keys()), index=list(PROGRAMS.keys()).index(suggested))
+    chosen_program = st.selectbox("Program", candidates, index=candidates.index(suggested))
 
     view = st.radio("Screen", ["Dashboard", "Workout", "Program Builder", "History", "Exercise Library", "AI Coach"])
 
@@ -208,15 +220,17 @@ if view == "Dashboard":
 
 elif view == "Program Builder":
     st.subheader("Program Recommendations")
+    st.write("- Hypertrophy: higher reps, moderate loads, more volume")
+    st.write("- Strength: lower reps, higher loads, longer rest")
     st.write("- 3 days/week: full-body")
     st.write("- 4+ days/week: upper/lower")
 
 elif view == "Workout":
     st.subheader(f"Workout · {chosen_program}")
-    rest_widget()
     with st.expander("Rest timer controls", expanded=False):
         st.session_state.rest_seconds = st.select_slider("Rest duration", options=[45, 60, 75, 90, 120, 150, 180], value=st.session_state.rest_seconds)
         st.caption("Timer auto-starts after each logged set.")
+
     day = st.selectbox("Choose workout day", list(adapted.keys()))
 
     for idx, (ex, rr, sets, swapped) in enumerate(adapted[day], start=1):
@@ -227,9 +241,10 @@ elif view == "Workout":
             st.caption(f"{sets} sets · {rr} reps")
             if ex in st.session_state.weight_targets:
                 st.caption(f"Suggested weight: {st.session_state.weight_targets[ex]} lb")
+
             for s in range(1, sets + 1):
                 k = f"{day}_{ex}_{s}"
-                c1, c2, c3, c4 = st.columns([1, 1, 1, 1])
+                c1, c2, c3, c4, c5 = st.columns([1, 1, 1, 1, 1])
                 with c1:
                     wt = st.number_input(f"Wt S{s}", min_value=0.0, step=2.5, key=f"wt_{k}")
                 with c2:
@@ -242,6 +257,9 @@ elif view == "Workout":
                                   "Exercise": ex, "Set": s, "Weight_lbs": wt, "Reps": reps, "RIR": rir, "Volume": wt * reps})
                         st.session_state.rest_end = time.time() + st.session_state.rest_seconds
                         st.success(f"Logged {ex} set {s}. Rest started.")
+                with c5:
+                    render_rest_inline()
+
             demo_url = EXERCISE_LIBRARY[ex]["url"]
             st.video(to_embed(demo_url))
             st.caption(f"If video fails, open directly: {demo_url}")
@@ -265,6 +283,7 @@ elif view == "AI Coach":
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
+
     if prompt := st.chat_input("Ask your coach or update settings (e.g., 'set rest timer to 120')"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         local_reply = try_apply_command(prompt)
@@ -275,7 +294,7 @@ elif view == "AI Coach":
         else:
             try:
                 equipment_text = ", ".join(st.session_state.selected_equipment)
-                payload = {"contents": [{"parts": [{"text": f"You are a coach. User equipment: {equipment_text}. Program: {chosen_program}. Question: {prompt}"}]}]}
+                payload = {"contents": [{"parts": [{"text": f"You are a coach. Goal: {st.session_state.goal_mode}. User equipment: {equipment_text}. Program: {chosen_program}. Question: {prompt}"}]}]}
                 response = requests.post(GEMINI_API_URL, json=payload, headers={"Content-Type": "application/json"}, params={"key": api_key}, timeout=20)
                 if response.status_code == 429:
                     reply = (
