@@ -13,7 +13,7 @@ st.title("🏋️‍♂️ HyperCustom Fit Tracker")
 DB_FILE = "workout_database.csv"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
-DEFAULT_EQUIPMENT_PROFILE = {
+EQUIPMENT_PROFILE = {
     "Marcy Smith MD-9010G": True,
     "Dumbbells (5-25 lb pairs)": True,
     "Kettlebells (15 lb, 35 lb)": True,
@@ -22,7 +22,6 @@ DEFAULT_EQUIPMENT_PROFILE = {
     "Air Rower": True,
     "Power Tower (pull-up/dip station)": True,
     "Olympic Barbell": False,
-    "Bench": True,
 }
 
 EXERCISE_LIBRARY = {
@@ -38,110 +37,38 @@ EXERCISE_LIBRARY = {
     "Smith Machine Flat Press": {
         "muscle": "Chest",
         "movement": "Horizontal Push",
-        "equipment": ["Marcy Smith MD-9010G", "Bench"],
+        "equipment": ["Marcy Smith MD-9010G"],
         "fallback": ["Dumbbell Flat Press", "Power Tower Push-Ups"],
-        "cues": ["Set safeties just below chest", "Control eccentric", "Press with stacked wrists"],
+        "cues": ["Set safeties one notch below chest", "Control eccentric", "Press with stacked wrists"],
         "mistakes": ["Bench too far forward", "Partial range only", "Wrists bent backward"],
         "url": "https://www.youtube.com/watch?v=9R4fQv1U8b0",
-    },
-    "Dumbbell Flat Press": {
-        "muscle": "Chest",
-        "movement": "Horizontal Push",
-        "equipment": ["Dumbbells (5-25 lb pairs)", "Bench"],
-        "fallback": ["Smith Machine Flat Press", "Power Tower Push-Ups"],
-        "cues": ["Slight arch is okay", "Lower with control", "Keep forearms vertical"],
-        "mistakes": ["Bouncing at bottom", "Elbows too high", "Losing wrist position"],
-        "url": "https://www.youtube.com/watch?v=VmB1G1K7v94",
-    },
-    "Power Tower Push-Ups": {
-        "muscle": "Chest",
-        "movement": "Horizontal Push",
-        "equipment": ["Power Tower (pull-up/dip station)"],
-        "fallback": ["Dumbbell Flat Press", "Smith Machine Flat Press"],
-        "cues": ["Body in straight line", "Hands under shoulders", "Full lockout"],
-        "mistakes": ["Sagging hips", "Short range", "Neck jutting forward"],
-        "url": "https://www.youtube.com/watch?v=IODxDxX7oi4",
     },
     "Barbell Row": {
         "muscle": "Back",
         "movement": "Horizontal Pull",
         "equipment": ["Olympic Barbell"],
         "fallback": ["Chest-Supported DB Row", "Smith Machine Bent Row", "Air Rower Intervals"],
-        "cues": ["Hinge first", "Pull elbows to hips", "Pause at torso"],
+        "cues": ["Hinge first", "Pull elbows toward hips", "Pause at torso"],
         "mistakes": ["Jerking from lower back", "Neck craning", "Too upright torso"],
         "url": "https://www.youtube.com/watch?v=vT2GjY_Umpw",
-    },
-    "Smith Machine Bent Row": {
-        "muscle": "Back",
-        "movement": "Horizontal Pull",
-        "equipment": ["Marcy Smith MD-9010G"],
-        "fallback": ["Chest-Supported DB Row", "Air Rower Intervals"],
-        "cues": ["Set pins safely", "Hinge and brace", "Row to lower ribs"],
-        "mistakes": ["Standing too tall", "Rounding low back", "Shrugging shoulders"],
-        "url": "https://www.youtube.com/watch?v=roCP6wCXPqo",
-    },
-    "Chest-Supported DB Row": {
-        "muscle": "Back",
-        "movement": "Horizontal Pull",
-        "equipment": ["Dumbbells (5-25 lb pairs)", "Bench"],
-        "fallback": ["Smith Machine Bent Row", "Air Rower Intervals"],
-        "cues": ["Chest on bench", "Pull elbow back", "Squeeze shoulder blade"],
-        "mistakes": ["Twisting torso", "Yanking weight", "Neck strain"],
-        "url": "https://www.youtube.com/watch?v=5PoEksoJNaw",
     },
     "Overhead Barbell Press": {
         "muscle": "Shoulders",
         "movement": "Vertical Push",
         "equipment": ["Olympic Barbell"],
         "fallback": ["Smith Machine Overhead Press", "Dumbbell Seated Press"],
-        "cues": ["Brace abs and glutes", "Head through at top", "Bar close to face"],
-        "mistakes": ["Overarching back", "Pressing out front", "Loose bar path"],
+        "cues": ["Brace abs and glutes", "Head moves through at top", "Bar close to face"],
+        "mistakes": ["Overarching lower back", "Pressing out in front", "Loose bar path"],
         "url": "https://www.youtube.com/watch?v=2yjwXTZQDDI",
-    },
-    "Smith Machine Overhead Press": {
-        "muscle": "Shoulders",
-        "movement": "Vertical Push",
-        "equipment": ["Marcy Smith MD-9010G", "Bench"],
-        "fallback": ["Dumbbell Seated Press"],
-        "cues": ["Back supported", "Wrists stacked", "Controlled lowering"],
-        "mistakes": ["Seat too low", "Flaring elbows", "Rushing reps"],
-        "url": "https://www.youtube.com/watch?v=R5JhoUX4hRQ",
-    },
-    "Dumbbell Seated Press": {
-        "muscle": "Shoulders",
-        "movement": "Vertical Push",
-        "equipment": ["Dumbbells (5-25 lb pairs)", "Bench"],
-        "fallback": ["Smith Machine Overhead Press"],
-        "cues": ["Feet planted", "Press up and in", "Keep ribs down"],
-        "mistakes": ["Overarching back", "Uneven lockout", "Banging DBs together"],
-        "url": "https://www.youtube.com/watch?v=qEwKCR5JCog",
     },
     "Lat Pulldown / Pull-up": {
         "muscle": "Back",
         "movement": "Vertical Pull",
         "equipment": ["Marcy Smith MD-9010G", "Power Tower (pull-up/dip station)"],
         "fallback": ["Band-Assisted Pull-Up", "Inverted Row on Smith Bar"],
-        "cues": ["Lead with elbows", "Chest up", "Full stretch at top"],
+        "cues": ["Lead with elbows", "Keep chest lifted", "Full stretch at top"],
         "mistakes": ["Pulling behind neck", "Using momentum", "Shrugging shoulders"],
         "url": "https://www.youtube.com/watch?v=CAwf7n6Luuc",
-    },
-    "Band-Assisted Pull-Up": {
-        "muscle": "Back",
-        "movement": "Vertical Pull",
-        "equipment": ["Power Tower (pull-up/dip station)"],
-        "fallback": ["Inverted Row on Smith Bar"],
-        "cues": ["Pull elbows down", "Core tight", "Full range of motion"],
-        "mistakes": ["Kipping", "Half reps", "Forward head posture"],
-        "url": "https://www.youtube.com/watch?v=eGo4IYlbE5g",
-    },
-    "Inverted Row on Smith Bar": {
-        "muscle": "Back",
-        "movement": "Horizontal Pull",
-        "equipment": ["Marcy Smith MD-9010G"],
-        "fallback": ["Chest-Supported DB Row"],
-        "cues": ["Body rigid", "Pull chest to bar", "Control lowering"],
-        "mistakes": ["Hips dropping", "Short ROM", "Shrugging"],
-        "url": "https://www.youtube.com/watch?v=2B6aN8P6WwM",
     },
     "Safety Squat Bar Squat": {
         "muscle": "Quads",
@@ -150,16 +77,16 @@ EXERCISE_LIBRARY = {
         "fallback": ["Smith Machine Squat", "Goblet Squat (35 lb KB)"],
         "cues": ["Brace before descent", "Knees track toes", "Drive mid-foot"],
         "mistakes": ["Chest collapsing", "Heels lifting", "Knees caving"],
-        "url": "https://www.youtube.com/watch?v=5MTEf2hP9PY",
+        "url": "https://www.youtube.com/shorts/1oed-UmAxFs",
     },
-    "Smith Machine Squat": {
-        "muscle": "Quads",
-        "movement": "Squat",
-        "equipment": ["Marcy Smith MD-9010G"],
-        "fallback": ["Goblet Squat (35 lb KB)"],
-        "cues": ["Feet slightly forward", "Sit between hips", "Drive through whole foot"],
-        "mistakes": ["Too narrow stance", "Knees collapse", "Cutting depth"],
-        "url": "https://www.youtube.com/watch?v=fEuYM-miK5U",
+    "Dumbbell Romanian Deadlift": {
+        "muscle": "Hamstrings",
+        "movement": "Hinge",
+        "equipment": ["Dumbbells (5-25 lb pairs)"],
+        "fallback": ["Curl Bar RDL", "Kettlebell RDL"],
+        "cues": ["Soft knees", "Hips back", "Keep dumbbells close"],
+        "mistakes": ["Squatting instead of hinging", "Rounding back", "Losing lats"],
+        "url": "https://www.youtube.com/shorts/7j-2m8M1M90",
     },
     "Goblet Squat (35 lb KB)": {
         "muscle": "Quads",
@@ -168,52 +95,7 @@ EXERCISE_LIBRARY = {
         "fallback": ["Smith Machine Squat", "Split Squat (DB)"],
         "cues": ["Hold bell high", "Elbows inside knees", "Stay tall"],
         "mistakes": ["Dropping chest", "Weight on toes", "Cutting depth"],
-        "url": "https://www.youtube.com/watch?v=6xwGFn-J_QM",
-    },
-    "Dumbbell Romanian Deadlift": {
-        "muscle": "Hamstrings",
-        "movement": "Hinge",
-        "equipment": ["Dumbbells (5-25 lb pairs)"],
-        "fallback": ["Curl Bar RDL", "Kettlebell RDL"],
-        "cues": ["Soft knees", "Hips back", "Keep weights close"],
-        "mistakes": ["Squatting instead of hinging", "Rounding back", "Losing lats"],
-        "url": "https://www.youtube.com/watch?v=0zG7o6hR0dQ",
-    },
-    "Curl Bar RDL": {
-        "muscle": "Hamstrings",
-        "movement": "Hinge",
-        "equipment": ["Curl Bar"],
-        "fallback": ["Dumbbell Romanian Deadlift", "Kettlebell RDL"],
-        "cues": ["Lats tight", "Hips back", "Shins mostly vertical"],
-        "mistakes": ["Bar drifting away", "Over-bending knees", "Rounding back"],
-        "url": "https://www.youtube.com/watch?v=jEy_czb3RKA",
-    },
-    "Kettlebell RDL": {
-        "muscle": "Hamstrings",
-        "movement": "Hinge",
-        "equipment": ["Kettlebells (15 lb, 35 lb)"],
-        "fallback": ["Dumbbell Romanian Deadlift", "Curl Bar RDL"],
-        "cues": ["Hips back", "Core braced", "Neutral spine"],
-        "mistakes": ["Squatting the rep", "Neck extension", "Loose lockout"],
-        "url": "https://www.youtube.com/watch?v=0zG7o6hR0dQ",
-    },
-    "Air Rower Intervals": {
-        "muscle": "Back",
-        "movement": "Conditioning",
-        "equipment": ["Air Rower"],
-        "fallback": ["Power Tower Knee Raise Conditioning"],
-        "cues": ["Leg drive first", "Then hip swing", "Then arm pull"],
-        "mistakes": ["Early arm bend", "Rounding lumbar", "Rushing recovery"],
-        "url": "https://www.youtube.com/watch?v=zQ82RYIFLN8",
-    },
-    "Power Tower Knee Raise Conditioning": {
-        "muscle": "Core",
-        "movement": "Conditioning",
-        "equipment": ["Power Tower (pull-up/dip station)"],
-        "fallback": ["Air Rower Intervals"],
-        "cues": ["Posterior pelvic tilt", "Slow control", "No swinging"],
-        "mistakes": ["Leg swing momentum", "Shrugged shoulders", "Short ROM"],
-        "url": "https://www.youtube.com/watch?v=JB2oyawG9KI",
+        "url": "https://www.youtube.com/shorts/sz0S9V5nXJ0",
     },
 }
 
@@ -223,20 +105,17 @@ ROUTINES = {
             {"name": "Barbell Bench Press", "range": "8-10", "sets": 3},
             {"name": "Barbell Row", "range": "8-12", "sets": 3},
             {"name": "Overhead Barbell Press", "range": "8-10", "sets": 3},
-            {"name": "Lat Pulldown / Pull-up", "range": "8-12", "sets": 3},
-            {"name": "Air Rower Intervals", "range": "10-15", "sets": 2},
+            {"name": "Lat Pulldown / Pull-up", "range": "10-12", "sets": 3},
         ],
         "Day 2: Lower Focus": [
             {"name": "Safety Squat Bar Squat", "range": "8-10", "sets": 3},
             {"name": "Dumbbell Romanian Deadlift", "range": "10-12", "sets": 3},
             {"name": "Goblet Squat (35 lb KB)", "range": "12-15", "sets": 3},
-            {"name": "Power Tower Knee Raise Conditioning", "range": "12-20", "sets": 2},
         ],
         "Day 3: Full Body Blend": [
             {"name": "Smith Machine Flat Press", "range": "8-12", "sets": 3},
-            {"name": "Chest-Supported DB Row", "range": "10-12", "sets": 3},
-            {"name": "Kettlebell RDL", "range": "10-15", "sets": 3},
-            {"name": "Lat Pulldown / Pull-up", "range": "8-12", "sets": 2},
+            {"name": "Lat Pulldown / Pull-up", "range": "8-12", "sets": 3},
+            {"name": "Dumbbell Romanian Deadlift", "range": "10-12", "sets": 3},
         ],
     },
     "4-Day Upper/Lower Split": {
@@ -244,39 +123,25 @@ ROUTINES = {
             {"name": "Smith Machine Flat Press", "range": "8-10", "sets": 3},
             {"name": "Barbell Row", "range": "8-12", "sets": 3},
             {"name": "Lat Pulldown / Pull-up", "range": "10-12", "sets": 3},
-            {"name": "Dumbbell Seated Press", "range": "10-12", "sets": 3},
         ],
         "Day 2: Lower A": [
             {"name": "Safety Squat Bar Squat", "range": "8-10", "sets": 3},
             {"name": "Dumbbell Romanian Deadlift", "range": "10-12", "sets": 3},
-            {"name": "Goblet Squat (35 lb KB)", "range": "12-15", "sets": 2},
         ],
         "Day 3: Upper B": [
             {"name": "Overhead Barbell Press", "range": "8-10", "sets": 3},
-            {"name": "Chest-Supported DB Row", "range": "10-12", "sets": 3},
-            {"name": "Dumbbell Flat Press", "range": "10-12", "sets": 3},
-            {"name": "Lat Pulldown / Pull-up", "range": "8-12", "sets": 2},
+            {"name": "Lat Pulldown / Pull-up", "range": "8-12", "sets": 3},
+            {"name": "Smith Machine Flat Press", "range": "8-12", "sets": 3},
         ],
         "Day 4: Lower B": [
-            {"name": "Smith Machine Squat", "range": "8-12", "sets": 3},
-            {"name": "Curl Bar RDL", "range": "10-12", "sets": 3},
-            {"name": "Power Tower Knee Raise Conditioning", "range": "12-20", "sets": 3},
-            {"name": "Air Rower Intervals", "range": "10-15", "sets": 2},
+            {"name": "Goblet Squat (35 lb KB)", "range": "12-15", "sets": 3},
+            {"name": "Dumbbell Romanian Deadlift", "range": "10-12", "sets": 3},
         ],
     },
 }
 
 
-def ensure_session_state():
-    if "equipment_profile" not in st.session_state:
-        st.session_state.equipment_profile = DEFAULT_EQUIPMENT_PROFILE.copy()
-    if "messages" not in st.session_state:
-        st.session_state.messages = [
-            {"role": "assistant", "content": "Ask about your home setup, progression, form, or substitutions."}
-        ]
-
-
-def save_set_to_csv(date_str, routine_name, exercise_name, set_num, weight, reps, rir, completed):
+def save_set_to_csv(date_str, routine_name, exercise_name, set_num, weight, reps, rir):
     new_row = pd.DataFrame(
         [
             {
@@ -284,11 +149,10 @@ def save_set_to_csv(date_str, routine_name, exercise_name, set_num, weight, reps
                 "Routine": routine_name,
                 "Exercise": exercise_name,
                 "Set": set_num,
-                "Weight_lbs": float(weight),
-                "Reps": int(reps),
-                "RIR": int(rir),
-                "Completed": int(completed),
-                "Volume": float(weight) * int(reps),
+                "Weight_lbs": weight,
+                "Reps": reps,
+                "RIR": rir,
+                "Volume": weight * reps,
             }
         ]
     )
@@ -299,35 +163,16 @@ def save_set_to_csv(date_str, routine_name, exercise_name, set_num, weight, reps
 
 
 def load_workout_history():
-    if not os.path.exists(DB_FILE):
-        return pd.DataFrame()
-
-    try:
-        df = pd.read_csv(DB_FILE)
-    except (pd.errors.EmptyDataError, pd.errors.ParserError):
-        return pd.DataFrame()
-
-    expected_defaults = {
-        "Weight_lbs": 0.0,
-        "Reps": 0,
-        "RIR": 0,
-        "Completed": 1,
-        "Volume": 0.0,
-    }
-
-    for col, default in expected_defaults.items():
-        if col not in df.columns:
-            df[col] = default
-
-    df["Weight_lbs"] = pd.to_numeric(df["Weight_lbs"], errors="coerce").fillna(0.0)
-    df["Reps"] = pd.to_numeric(df["Reps"], errors="coerce").fillna(0).astype(int)
-    df["RIR"] = pd.to_numeric(df["RIR"], errors="coerce").fillna(0).astype(int)
-    df["Completed"] = pd.to_numeric(df["Completed"], errors="coerce").fillna(1).astype(int)
-    df["Volume"] = pd.to_numeric(df["Volume"], errors="coerce")
-    missing_volume = df["Volume"].isna() | (df["Volume"] == 0)
-    df.loc[missing_volume, "Volume"] = df.loc[missing_volume, "Weight_lbs"] * df.loc[missing_volume, "Reps"]
-
-    return df
+    if os.path.exists(DB_FILE):
+        try:
+            df = pd.read_csv(DB_FILE)
+            for col in ["Weight_lbs", "Reps", "Volume", "RIR"]:
+                if col not in df.columns:
+                    df[col] = 0
+            return df
+        except (pd.errors.EmptyDataError, pd.errors.ParserError):
+            return pd.DataFrame()
+    return pd.DataFrame()
 
 
 def youtube_embed_url(url: str) -> str:
@@ -340,37 +185,15 @@ def youtube_embed_url(url: str) -> str:
     return url
 
 
-def parse_rep_range(rep_range: str):
-    if "-" in rep_range:
-        low, high = rep_range.split("-")
-        return int(low.strip()), int(high.strip())
-    value = int(rep_range.strip())
-    return value, value
+def parse_rep_range(rep_range):
+    low, high = rep_range.split("-")
+    return int(low.strip()), int(high.strip())
 
 
-def equipment_ready(exercise_name: str):
-    needs = EXERCISE_LIBRARY.get(exercise_name, {}).get("equipment", [])
-    profile = st.session_state.equipment_profile
-    return all(profile.get(item, False) for item in needs)
-
-
-def best_substitution(exercise_name: str):
-    profile = st.session_state.equipment_profile
-    for candidate in EXERCISE_LIBRARY.get(exercise_name, {}).get("fallback", []):
-        if candidate in EXERCISE_LIBRARY:
-            needs = EXERCISE_LIBRARY[candidate].get("equipment", [])
-            if all(profile.get(item, False) for item in needs):
-                return candidate
-    return None
-
-
-def suggest_progression(exercise_name: str, rep_range: str, history_df: pd.DataFrame):
-    if history_df.empty:
-        return "No prior data yet. Start conservative and focus clean form."
-
-    ex_df = history_df[(history_df["Exercise"] == exercise_name) & (history_df["Completed"] == 1)]
+def suggest_progression(exercise_name, rep_range, history_df):
+    ex_df = history_df[history_df["Exercise"] == exercise_name] if not history_df.empty else pd.DataFrame()
     if ex_df.empty:
-        return "No prior completed sets for this movement yet."
+        return "No prior data yet. Start conservative and aim for clean reps.", 0.0
 
     latest_date = ex_df["Date"].iloc[-1]
     latest = ex_df[ex_df["Date"] == latest_date]
@@ -380,94 +203,82 @@ def suggest_progression(exercise_name: str, rep_range: str, history_df: pd.DataF
     _, rep_high = parse_rep_range(rep_range)
 
     if avg_reps >= rep_high and avg_rir >= 1:
-        return f"Progression target: add +5 lb next session (around {avg_weight + 5:.1f} lb)."
-    if avg_reps >= rep_high and avg_rir < 1:
-        return f"Hold at ~{avg_weight:.1f} lb; keep top-range reps with better control."
-    return f"Keep ~{avg_weight:.1f} lb and aim +1 total rep across sets."
+        return f"You hit the top of range. Add +5 lb next session (target ~{avg_weight + 5:.1f} lb).", 5.0
+    if avg_reps >= rep_high:
+        return f"Hold weight ({avg_weight:.1f} lb) and improve control at this range.", 0.0
+    return f"Keep weight near {avg_weight:.1f} lb and add 1 rep total across sets.", 0.0
 
 
-def weekly_muscle_volume(history_df: pd.DataFrame):
+def help_tip(label: str, tip: str):
+    with st.popover(f"❓ {label}"):
+        st.caption(tip)
+
+
+def demo_link(url: str):
+    embed = youtube_embed_url(url)
+    if "youtube.com/embed/" in embed and "?" not in embed:
+        return f"{embed}?start=5&end=65"
+    return embed
+
+
+def equipment_ready(exercise_name):
+    data = EXERCISE_LIBRARY.get(exercise_name, {})
+    needs = data.get("equipment", [])
+    return all(EQUIPMENT_PROFILE.get(item, False) or item == "Bench" for item in needs)
+
+
+def weekly_muscle_volume(history_df):
     if history_df.empty:
         return pd.DataFrame(columns=["Muscle", "Volume"])
-
     map_muscle = {name: meta["muscle"] for name, meta in EXERCISE_LIBRARY.items()}
-    copy_df = history_df.copy()
-    copy_df["Muscle"] = copy_df["Exercise"].map(map_muscle).fillna("Other")
-    return (
-        copy_df.groupby("Muscle", as_index=False)["Volume"]
-        .sum()
-        .sort_values("Volume", ascending=False)
-    )
+    history_df = history_df.copy()
+    history_df["Muscle"] = history_df["Exercise"].map(map_muscle).fillna("Other")
+    return history_df.groupby("Muscle", as_index=False)["Volume"].sum().sort_values("Volume", ascending=False)
 
 
-def fatigue_signal(history_df: pd.DataFrame):
-    if history_df.empty or history_df.shape[0] < 12:
-        return "No fatigue signal yet; log a few sessions first."
-
+def fatigue_signal(history_df):
+    if history_df.empty:
+        return "No fatigue signal yet; log at least 2 sessions."
     recent = history_df.tail(30)
-    low_rir_ratio = float((recent["RIR"] <= 1).mean())
-    completion_ratio = float((recent["Completed"] == 1).mean())
-
-    if low_rir_ratio >= 0.60:
-        return "High fatigue trend: consider a 1-week deload at ~70% normal volume."
-    if completion_ratio < 0.85:
-        return "Completion trend dipped. Reduce set count 10-20% for one week and recover."
+    low_rir_ratio = (recent["RIR"] <= 1).mean()
+    if low_rir_ratio >= 0.6:
+        return "High fatigue trend detected. Plan a deload: -30% volume for 1 week."
     return "Fatigue looks manageable. Continue progressing."
 
 
-def movement_volume_breakdown(history_df: pd.DataFrame):
-    if history_df.empty:
-        return pd.DataFrame(columns=["Movement", "Volume"])
-    map_move = {name: meta["movement"] for name, meta in EXERCISE_LIBRARY.items()}
-    copy_df = history_df.copy()
-    copy_df["Movement"] = copy_df["Exercise"].map(map_move).fillna("Other")
-    return (
-        copy_df.groupby("Movement", as_index=False)["Volume"]
-        .sum()
-        .sort_values("Volume", ascending=False)
-    )
-
-
-ensure_session_state()
-history_df = load_workout_history()
-
-# Sidebar
 st.sidebar.header("⚙️ Preferences")
 split_type = st.sidebar.selectbox("Program Layout", list(ROUTINES.keys()))
-goal_mode = st.sidebar.selectbox("Goal Mode", ["Hypertrophy", "Strength", "Fat Loss"])
 menu = st.sidebar.radio(
     "Navigation",
     ["🏠 Dashboard", "📝 Today’s Workout", "📈 History & Analytics", "📚 Exercise Library", "🤖 AI Coach", "⚙️ Settings"],
 )
+
 active_routine = ROUTINES[split_type]
+history_df = load_workout_history()
 
 if menu == "🏠 Dashboard":
     st.subheader("Training Dashboard")
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3 = st.columns(3)
     c1.metric("Logged Sets", int(history_df.shape[0]))
     c2.metric("Total Volume", f"{history_df['Volume'].sum():.0f} lb" if not history_df.empty else "0 lb")
     c3.metric("Unique Exercises", int(history_df["Exercise"].nunique()) if not history_df.empty else 0)
-    c4.metric("Goal Mode", goal_mode)
-
     st.info(fatigue_signal(history_df))
+    help_tip(
+        "Fatigue Signal",
+        "Uses recent low-RIR and completion trends. If high fatigue is flagged, reduce volume for ~1 week.",
+    )
 
     vol_df = weekly_muscle_volume(history_df)
     if not vol_df.empty:
-        st.markdown("#### Volume by Muscle")
+        st.markdown("#### Weekly Volume by Muscle")
         st.bar_chart(vol_df.set_index("Muscle")["Volume"])
-
-    move_df = movement_volume_breakdown(history_df)
-    if not move_df.empty:
-        st.markdown("#### Volume by Movement Pattern")
-        st.bar_chart(move_df.set_index("Movement")["Volume"])
 
 elif menu == "📝 Today’s Workout":
     st.subheader(f"Today’s Workout · {split_type}")
     selected_day = st.selectbox("Routine day", list(active_routine.keys()))
-    day_work = active_routine[selected_day]
 
     st.sidebar.markdown("---")
-    duration = st.sidebar.selectbox("Rest timer (seconds)", [60, 90, 120, 180], index=1)
+    duration = st.sidebar.selectbox("Rest timer", [60, 90, 120, 180], index=1)
     if st.sidebar.button("Start rest timer", use_container_width=True):
         progress_bar = st.sidebar.progress(0)
         for i in range(100):
@@ -475,37 +286,27 @@ elif menu == "📝 Today’s Workout":
             progress_bar.progress(i + 1)
         st.sidebar.success("Rest complete. Next set.")
 
-    total_exercises = len(day_work)
-    completed_exercises = 0
-    workout_inputs = {}
-
     st.markdown("### Session Flow")
-    for idx, ex in enumerate(day_work, start=1):
+    workout_inputs = {}
+    for ex in active_routine[selected_day]:
         ex_name = ex["name"]
-        rep_range = ex["range"]
-        sets_count = ex["sets"]
+        meta = EXERCISE_LIBRARY[ex_name]
+        reps = ex["range"]
 
-        # Auto-swap if needed
-        active_name = ex_name
-        if not equipment_ready(ex_name):
-            sub = best_substitution(ex_name)
-            if sub:
-                active_name = sub
-                st.warning(f"{ex_name}: primary setup unavailable. Auto-substituted with **{sub}**.")
-            else:
-                st.error(f"{ex_name}: no valid substitution available with current equipment.")
-                continue
+        st.markdown(f"#### {ex_name} · {reps} reps")
+        if equipment_ready(ex_name):
+            st.success("Equipment ready for this movement.")
+        else:
+            st.warning("Primary equipment missing. Use substitution below.")
 
-        meta = EXERCISE_LIBRARY[active_name]
-        st.markdown(f"#### {idx}/{total_exercises} · {active_name} · {rep_range} reps")
-        if active_name == ex_name:
-            st.success("Equipment ready.")
-        suggestion = suggest_progression(active_name, rep_range, history_df)
+        suggestion, _ = suggest_progression(ex_name, reps, history_df)
         st.caption(f"Progression: {suggestion}")
+        help_tip("Progression", "If you hit top-end reps with ~1-2 RIR, add a small load next session.")
         st.caption(f"Substitutions: {', '.join(meta['fallback'])}")
+        help_tip("RIR", "Reps In Reserve: reps left before failure. 2 RIR means ~2 clean reps left.")
 
-        with st.expander("Form demo + cues + mistakes"):
-            st.video(youtube_embed_url(meta["url"]))
+        with st.expander("Form demo + cues"):
+            st.video(demo_link(meta["url"]))
             st.write("**Key cues**")
             for cue in meta["cues"]:
                 st.write(f"- {cue}")
@@ -513,36 +314,23 @@ elif menu == "📝 Today’s Workout":
             for err in meta["mistakes"]:
                 st.write(f"- {err}")
 
-        cols = st.columns(sets_count)
+        cols = st.columns(ex["sets"])
         ex_inputs = []
-        set_completion_flags = []
-
-        for set_idx in range(sets_count):
-            with cols[set_idx]:
-                st.caption(f"Set {set_idx + 1}")
-                wt = st.number_input("Wt (lb)", min_value=0.0, step=2.5, key=f"{selected_day}_{active_name}_w_{set_idx}")
-                rp = st.number_input("Reps", min_value=0, step=1, key=f"{selected_day}_{active_name}_r_{set_idx}")
-                rir = st.slider("RIR", 0, 4, 2, key=f"{selected_day}_{active_name}_rir_{set_idx}")
-                done = st.checkbox("Done", key=f"{selected_day}_{active_name}_done_{set_idx}")
-                ex_inputs.append((set_idx + 1, wt, rp, rir, done))
-                set_completion_flags.append(done)
-
-        if all(set_completion_flags):
-            completed_exercises += 1
-
-        workout_inputs[active_name] = ex_inputs
+        for i in range(ex["sets"]):
+            with cols[i]:
+                st.caption(f"Set {i+1}")
+                wt = st.number_input("Wt (lb)", min_value=0.0, step=2.5, key=f"{ex_name}_w_{i}")
+                rp = st.number_input("Reps", min_value=0, step=1, key=f"{ex_name}_r_{i}")
+                rir = st.slider("RIR", 0, 4, 2, key=f"{ex_name}_rir_{i}")
+                ex_inputs.append((i + 1, wt, rp, rir))
+        workout_inputs[ex_name] = ex_inputs
         st.divider()
-
-    completion_pct = int((completed_exercises / total_exercises) * 100) if total_exercises else 0
-    st.progress(completion_pct / 100)
-    st.caption(f"Workout completion: {completion_pct}%")
 
     if st.button("Save workout", type="primary"):
         today_str = datetime.date.today().strftime("%b %d, %Y")
         for ex_name, sets_data in workout_inputs.items():
-            for set_num, weight, reps, rir, done in sets_data:
-                if done:
-                    save_set_to_csv(today_str, selected_day, ex_name, set_num, weight, reps, rir, done)
+            for set_num, weight, reps, rir in sets_data:
+                save_set_to_csv(today_str, selected_day, ex_name, set_num, weight, reps, rir)
         st.success("Workout saved.")
 
 elif menu == "📈 History & Analytics":
@@ -551,24 +339,9 @@ elif menu == "📈 History & Analytics":
         st.warning("No sessions logged yet.")
     else:
         st.dataframe(history_df.sort_index(ascending=False), use_container_width=True)
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("#### Volume by Exercise")
-            ex_vol = (
-                history_df.groupby("Exercise", as_index=False)["Volume"]
-                .sum()
-                .sort_values("Volume", ascending=False)
-            )
-            st.bar_chart(ex_vol.set_index("Exercise")["Volume"])
-        with col2:
-            st.markdown("#### Average RIR by Exercise")
-            rir_avg = (
-                history_df.groupby("Exercise", as_index=False)["RIR"]
-                .mean()
-                .sort_values("RIR", ascending=True)
-            )
-            st.bar_chart(rir_avg.set_index("Exercise")["RIR"])
+        st.markdown("#### Volume by Exercise")
+        ex_vol = history_df.groupby("Exercise", as_index=False)["Volume"].sum().sort_values("Volume", ascending=False)
+        st.bar_chart(ex_vol.set_index("Exercise")["Volume"])
 
 elif menu == "📚 Exercise Library":
     st.subheader("Exercise Library & Substitutions")
@@ -577,18 +350,17 @@ elif menu == "📚 Exercise Library":
             st.write(f"**Muscle:** {meta['muscle']} | **Pattern:** {meta['movement']}")
             st.write(f"**Required equipment:** {', '.join(meta['equipment'])}")
             st.write(f"**Best substitutions:** {', '.join(meta['fallback'])}")
-            st.video(youtube_embed_url(meta["url"]))
+            st.video(demo_link(meta["url"]))
 
 elif menu == "⚙️ Settings":
     st.subheader("Equipment Settings")
-    st.caption("Toggle your available equipment so substitutions are personalized.")
-    for item in list(st.session_state.equipment_profile.keys()):
-        st.session_state.equipment_profile[item] = st.checkbox(item, value=st.session_state.equipment_profile[item])
-
-    if st.session_state.equipment_profile.get("Olympic Barbell"):
-        st.success("Olympic bar enabled: barbell movements remain primary.")
+    st.caption("Turn equipment on/off to personalize substitutions.")
+    for item, owned in list(EQUIPMENT_PROFILE.items()):
+        EQUIPMENT_PROFILE[item] = st.checkbox(item, value=owned)
+    if EQUIPMENT_PROFILE["Olympic Barbell"]:
+        st.success("Nice upgrade. Olympic-bar movements will stay as primary choices.")
     else:
-        st.info("Olympic bar disabled: app will prioritize Smith/DB/KB/SSB alternatives.")
+        st.info("No Olympic bar set. The plan prioritizes Smith/DB/KB/SSB substitutions.")
 
 elif menu == "🤖 AI Coach":
     st.subheader("AI Coach")
@@ -596,8 +368,11 @@ elif menu == "🤖 AI Coach":
     api_key = raw_key.strip()
 
     if not api_key:
-        st.info("Add your Gemini API key in the sidebar.")
+        st.info("Add your Gemini API key in sidebar.")
     else:
+        if "messages" not in st.session_state:
+            st.session_state.messages = [{"role": "assistant", "content": "Ask about your home setup, overload, and form."}]
+
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
                 st.write(msg["content"])
@@ -607,24 +382,21 @@ elif menu == "🤖 AI Coach":
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     try:
-                        equipment_on = [k for k, v in st.session_state.equipment_profile.items() if v]
-                        system_context = (
-                            "You are an elite hypertrophy coach for a home gym athlete. "
-                            f"Available equipment: {', '.join(equipment_on)}. "
-                            f"Current goal mode: {goal_mode}. "
-                            "Keep responses concise, specific, and actionable."
-                        )
-
                         payload = {
                             "contents": [
                                 {
                                     "parts": [
-                                        {"text": f"{system_context}\nUser question: {prompt}"}
+                                        {
+                                            "text": (
+                                                "You are an elite hypertrophy coach for a home gym athlete with Smith machine, "
+                                                "dumbbells 5-25, kettlebells 15/35, SSB, curl bar, air rower, and power tower. "
+                                                f"Question: {prompt}"
+                                            )
+                                        }
                                     ]
                                 }
                             ]
                         }
-
                         response = requests.post(
                             GEMINI_API_URL,
                             json=payload,
@@ -632,16 +404,12 @@ elif menu == "🤖 AI Coach":
                             params={"key": api_key},
                             timeout=20,
                         )
-
                         if response.status_code != 200:
                             ai_reply = f"Connection rejected ({response.status_code})."
                         else:
-                            data = response.json()
-                            ai_reply = data["candidates"][0]["content"]["parts"][0]["text"]
-
+                            ai_reply = response.json()["candidates"][0]["content"]["parts"][0]["text"]
                         st.write(ai_reply)
                         st.session_state.messages.append({"role": "assistant", "content": ai_reply})
-
                     except requests.RequestException as exc:
                         err = f"Network/API error: {exc}"
                         st.write(err)
