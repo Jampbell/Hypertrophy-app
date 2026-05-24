@@ -92,6 +92,10 @@ def init_state():
     ss.setdefault("days_available", 4)
     ss.setdefault("weight_targets", {})
     ss.setdefault("goal_mode", "Hypertrophy")
+    ss.setdefault("exercise_notes", {})
+    ss.setdefault("bw_log", [])
+    ss.setdefault("nutrition_targets", {"calories": 2600, "protein": 180, "carbs": 280, "fat": 80})
+    ss.setdefault("nutrition_intake", {"calories": 0, "protein": 0, "carbs": 0, "fat": 0})
 
 
 def has_eq(ex):
@@ -181,6 +185,18 @@ def try_apply_command(prompt: str):
     return None
 
 
+def add_bodyweight_entry(weight):
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    st.session_state.bw_log.append({"Date": today, "Weight": float(weight)})
+
+
+def lift_progress_by_exercise(df):
+    if df.empty:
+        return pd.DataFrame()
+    grouped = df.sort_values("Date").groupby("Exercise", as_index=False).tail(1)
+    return grouped[["Date", "Exercise", "Weight_lbs", "Reps", "Volume"]].sort_values("Exercise")
+
+
 def render_rest_inline():
     now = time.time()
     if st.session_state.rest_end > now:
@@ -194,8 +210,22 @@ def render_rest_inline():
 init_state()
 history = load_history()
 
-st.title("🏋️ HyperCustom Fit")
-st.caption("Equipment-aware training plans for home and commercial gyms.")
+
+st.markdown("""
+<style>
+.main .block-container {padding-top: 1.2rem; padding-bottom: 2rem; max-width: 1100px;}
+.app-hero {background: linear-gradient(135deg,#111827,#1f2937); padding: 16px 20px; border-radius: 14px; border:1px solid #334155; margin-bottom: 12px;}
+.app-hero h2 {color:#f8fafc; margin:0; font-size:1.35rem}
+.app-hero p {color:#cbd5e1; margin:.35rem 0 0 0;}
+.kpi-grid {display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:10px; margin:8px 0 14px 0;}
+.kpi-card {background:#111827; border:1px solid #334155; border-radius:12px; padding:10px 12px;}
+.kpi-label {color:#94a3b8; font-size:.78rem;}
+.kpi-value {color:#f8fafc; font-size:1.2rem; font-weight:700;}
+.section-card {background:#0b1220; border:1px solid #243041; border-radius:14px; padding:10px 12px; margin-bottom:10px;}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("<div class='app-hero'><h2>🏋️ HyperCustom Fit</h2><p>Equipment-aware coaching with cleaner tracking, progression, and nutrition in one place.</p></div>", unsafe_allow_html=True)
 
 with st.sidebar:
     st.header("Setup")
@@ -212,19 +242,76 @@ with st.sidebar:
     st.success(f"Suggested plan: {suggested}")
     chosen_program = st.selectbox("Program", candidates, index=candidates.index(suggested))
 
-    view = st.radio("Screen", ["Dashboard", "Workout", "Program Builder", "History", "Exercise Library", "AI Coach"])
+    view = st.radio("Screen", ["Dashboard", "Workout", "Progress Tracker", "Nutrition", "Program Builder", "History", "Exercise Library", "AI Coach"])
 
 adapted = adapt_program(chosen_program)
 
 if view == "Dashboard":
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Equipment Selected", len(st.session_state.selected_equipment))
-    c2.metric("Program Days", PROGRAMS[chosen_program]["days"])
-    c3.metric("Logged Sets", 0 if history.empty else int(history.shape[0]))
+    eq_count = len(st.session_state.selected_equipment)
+    p_days = PROGRAMS[chosen_program]["days"]
+    set_count = 0 if history.empty else int(history.shape[0])
+    st.markdown(
+        f"""<div class='kpi-grid'>
+        <div class='kpi-card'><div class='kpi-label'>Equipment Selected</div><div class='kpi-value'>{eq_count}</div></div>
+        <div class='kpi-card'><div class='kpi-label'>Program Days</div><div class='kpi-value'>{p_days}</div></div>
+        <div class='kpi-card'><div class='kpi-label'>Logged Sets</div><div class='kpi-value'>{set_count}</div></div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
     for day, items in adapted.items():
         with st.expander(day):
             for ex, rr, sets, swapped in items:
                 st.write(f"- {ex}{' (auto-sub)' if swapped else ''} · {sets} x {rr}")
+
+elif view == "Progress Tracker":
+    st.subheader("Progress Tracker")
+    c1, c2 = st.columns(2)
+    with c1:
+        bw = st.number_input("Bodyweight (lb)", min_value=0.0, step=0.1)
+        if st.button("Log bodyweight"):
+            add_bodyweight_entry(bw)
+            st.success("Bodyweight logged.")
+    with c2:
+        st.write("**Latest Lift Performance**")
+        latest = lift_progress_by_exercise(history)
+        if latest.empty:
+            st.info("No lift history yet.")
+        else:
+            st.dataframe(latest, use_container_width=True)
+
+    if st.session_state.bw_log:
+        bw_df = pd.DataFrame(st.session_state.bw_log)
+        st.line_chart(bw_df.set_index("Date")["Weight"])
+
+elif view == "Nutrition":
+    st.subheader("Nutrition Targets")
+    t = st.session_state.nutrition_targets
+    i = st.session_state.nutrition_intake
+
+    c1, c2, c3, c4 = st.columns(4)
+    t["calories"] = c1.number_input("Target calories", min_value=1000, max_value=6000, value=int(t["calories"]))
+    t["protein"] = c2.number_input("Target protein (g)", min_value=50, max_value=400, value=int(t["protein"]))
+    t["carbs"] = c3.number_input("Target carbs (g)", min_value=50, max_value=700, value=int(t["carbs"]))
+    t["fat"] = c4.number_input("Target fat (g)", min_value=20, max_value=200, value=int(t["fat"]))
+
+    st.markdown("#### Log intake")
+    l1, l2, l3, l4 = st.columns(4)
+    add_kcal = l1.number_input("Calories", min_value=0, step=50)
+    add_p = l2.number_input("Protein", min_value=0, step=5)
+    add_c = l3.number_input("Carbs", min_value=0, step=5)
+    add_f = l4.number_input("Fat", min_value=0, step=5)
+    if st.button("Add nutrition entry"):
+        i["calories"] += int(add_kcal)
+        i["protein"] += int(add_p)
+        i["carbs"] += int(add_c)
+        i["fat"] += int(add_f)
+        st.success("Nutrition entry added.")
+
+    mc1, mc2, mc3, mc4 = st.columns(4)
+    mc1.metric("Calories", f"{i['calories']}/{t['calories']}")
+    mc2.metric("Protein", f"{i['protein']}/{t['protein']} g")
+    mc3.metric("Carbs", f"{i['carbs']}/{t['carbs']} g")
+    mc4.metric("Fat", f"{i['fat']}/{t['fat']} g")
 
 elif view == "Program Builder":
     st.subheader("Program Recommendations")
@@ -242,11 +329,18 @@ elif view == "Workout":
     day = st.selectbox("Choose workout day", list(adapted.keys()))
 
     for idx, (ex, rr, sets, swapped) in enumerate(adapted[day], start=1):
-        with st.container(border=True):
+        with st.container(border=False):
+            st.markdown("<div class='section-card'>", unsafe_allow_html=True)
             st.markdown(f"### {idx}. {ex}")
             if swapped:
                 st.warning("Auto-substituted based on equipment")
             st.caption(f"{sets} sets · {rr} reps")
+            n1, n2 = st.columns(2)
+            if n1.button("History", key=f"hx_{day}_{ex}"):
+                ex_hist = history[history["Exercise"] == ex] if not history.empty else pd.DataFrame()
+                st.dataframe(ex_hist.tail(8), use_container_width=True) if not ex_hist.empty else st.info("No history for this exercise yet.")
+            current_note = st.session_state.exercise_notes.get(ex, "")
+            st.session_state.exercise_notes[ex] = n2.text_input("Notes", value=current_note, key=f"note_{day}_{ex}")
             if ex in st.session_state.weight_targets:
                 st.caption(f"Suggested weight: {st.session_state.weight_targets[ex]} lb")
 
@@ -271,6 +365,7 @@ elif view == "Workout":
             demo_url = EXERCISE_LIBRARY[ex]["url"]
             st.video(to_embed(demo_url))
             st.caption(f"If video fails, open directly: {demo_url}")
+            st.markdown("</div>", unsafe_allow_html=True)
 
 elif view == "History":
     st.subheader("History")
